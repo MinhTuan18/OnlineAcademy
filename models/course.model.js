@@ -50,6 +50,11 @@ const CourseSchema = new mongoose.Schema({
   }
 });
 
+
+CourseSchema.statics.getCourseByCategoryID = function (categoryID) {
+  return this.find({categoryID: categoryID});
+}
+
 CourseSchema.set('toObject', { getters: true });
 CourseSchema.set('toJSON', { getters: true });
 
