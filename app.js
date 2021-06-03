@@ -30,7 +30,7 @@ mongoose.connection.on('connected', () => {
 });
 
 app.use('/api/categories', require('./routes/category.route'));
-
+app.use('/api/webhook', require('./routes/webhook.route'));
 
 
 
