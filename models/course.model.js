@@ -2,53 +2,21 @@ const mongoose = require('mongoose');
 const Category = require('./category.model');
 
 const CourseSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  categoryID: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
-  },
-  coverImage: {
-    type: String,
-  },
-  tutorID: {
-    type: String,
-    required: true,
-  },
-  shortDesc: {
-    type: String,
-  },
-  detailDesc: {
-    type: String,
-  },
-  rating: {
-    type: Number,
-    min: 0,
-    max: 10,
-  },
-  numOfRating: {
-    type: Number,
-  },
-  numOfRegistration: {
-    type: Number,
-    default: 0,
-  },
-  fee: {
-    type: Number,
-  },
-  discount: {
-    type: Number,
-  },
-  lastModifed: {
-    type: Date,
-  },
-  status: {
-    type: Boolean,
-    default: false, //False = OnGoing
-  }
-});
+    title: {type: String, required: true},
+    catID: {type: mongoose.Schema.Types.ObjectId, ref: 'Category'},
+    coverImage: {type: String, default: ''},
+    tutorID: {type: String, default: ''},
+    shortDesc: {type: String, default: ''},
+    detailDesc: {type: String, default: ''},
+    rating: {type: Number, min: 0, max: 10, default: 0},
+    numOfRatings: {type: Number, default: 0},
+    numOfRegistrations: {type: Number, default: 0},
+    fee: {type: Number, default: 0},
+    discount: {type: Number, default: 0, min: 0, max: 1},
+    status: {type: String, default: 'Ongoing'}
+    },
+    {timestamps: true}
+);
 
 
 CourseSchema.statics.getCourseByCategoryID = function (categoryID) {
@@ -58,6 +26,43 @@ CourseSchema.statics.getCourseByCategoryID = function (categoryID) {
 CourseSchema.set('toObject', { getters: true });
 CourseSchema.set('toJSON', { getters: true });
 
-const Course = mongoose.model('Course', CourseSchema);
+const Courses = mongoose.model('Course', CourseSchema);
 
-module.exports = Course;
+module.exports = {
+    async all() {
+        const courses = await Courses.find();
+        return courses;
+    },
+
+    async single(id) {
+        const course = await Courses.findById(mongoose.Types.ObjectId(id));
+        return course;
+    },
+
+    add (courseInfo) {
+        const newCourse = new Courses(courseInfo);
+        newCourse.save((err) => {
+            if (err) {
+                //console.log(err);
+                return null;
+            }
+        })
+        return newCourse;
+    },
+
+    update (id, updateInfo) {
+        Courses.findByIdAndUpdate(mongoose.Types.ObjectId(id), updateInfo, {new: true}, (err) => {
+            if (err) {
+                console.log(err);
+            }
+        })
+    },
+
+    delete (id) {
+        Courses.findByIdAndDelete(mongoose.Types.ObjectId(id), (err) => {
+            if (err) {
+                console.log(err);
+            }
+        })
+    }
+};
