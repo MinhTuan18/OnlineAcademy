@@ -1,11 +1,6 @@
 const courseModel = require('../models/course.model');
 
-// module.exports = {
-//   getCourseByCategoryID: function (req, res) {
-    
-//   },
 
-// }
 
 exports.getCourseByCategoryID = (req, res) => {
     const categoryID  = req.params.id;
