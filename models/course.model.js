@@ -50,14 +50,32 @@ const CourseSchema = new mongoose.Schema({
   }
 });
 
+CourseSchema.index({ title: 'text' });
 
-CourseSchema.statics.getCourseByCategoryID = function (categoryID) {
-  return this.find({categoryID: categoryID});
+
+CourseSchema.statics.getCourseByCategoryID = function (id) {
+  return this.find({ categoryID: id })
+  .then((value) => {
+    return value;
+  })
+  .catch((err) => {
+    throw err;
+  });
+}
+
+CourseSchema.statics.searchCourseByTitle = function (query) {
+  return this.find({ $text: { $search: query } })
+    .then((value) => {
+      return value;
+    })
+    .catch((err) => {
+      throw err;
+    });
 }
 
 CourseSchema.set('toObject', { getters: true });
 CourseSchema.set('toJSON', { getters: true });
 
 const Course = mongoose.model('Course', CourseSchema);
-
+Course.createIndexes();
 module.exports = Course;
