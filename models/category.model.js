@@ -21,64 +21,34 @@ CategorySchema.statics.addCategory = function (categoryName) {
   return newCategory;
 }
 
-CategorySchema.statics.getAllCategory = function (callBack) {
-  this.find({}, (error, result) => {
-    if(error) {
-        callBack(err);
-    }
-    else {
-      callBack(null, result);
-    }
-  });
+CategorySchema.statics.getAllCategory = async function () {
+  const categories = await this.find();
+  return categories;
 }
 
-CategorySchema.statics.getCategoryById = function (categoryId, callBack) {
-  this.find({_id: categoryId })
+CategorySchema.statics.getCategoryById = async function (categoryID) {
+  /* return this.findOne({_id: categoryID })
     .then((value) => {
-      if (!value) {
-        callBack({
-          message: {
-            msgBody: 'No category found!',
-            msgError: true,
-          },
-        });
-      } else {
-        callBack(null, value);
-      }
+      return value;
     })
     .catch((err) => {
-      callBack(err);
-    });
+      throw err;
+    }); */
+
+    const category = await this.findOne({_id: categoryID});
+    return category;
 };
 
-CategorySchema.statics.updateCategory = function (id, categoryName, callBack) {
-  this.findOne({ _id: id })
-    .then((document) => {
-      if (!document) {
-        callBack({
-          message: {
-            msgBody: 'Can not found category!',
-            msgError: true,
-          },
-        });
-      } else {
-        this.update({ _id: id }, {name: categoryName}, (err, doc) => {
-          if (err) {
-            callBack(err);
-          } else {
-            callBack(null, doc);
-          }
-        });
-      }
-    })
-    .catch((err) => {
-      callBack(err);
-    });
+CategorySchema.statics.updateCategory = async function (id, categoryName) {
+  const result = await this.findByIdAndUpdate({_id: id}, {name: categoryName}, {new: true});
+  return result;
 }
 
 CategorySchema.statics.deleteCategory = async function (id) {
-  return await this.findByIdAndDelete(id);
+  const result = await this.findByIdAndDelete(id);
+  return result;
 }
+
 CategorySchema.set('toObject', { getters: true });
 CategorySchema.set('toJSON', { getters: true });
 
