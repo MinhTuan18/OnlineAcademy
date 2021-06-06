@@ -5,11 +5,14 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const bodyParser = require('body-parser')
 
 const app = express();
 dotenv.config();
 
 app.use(express.json());
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}));
 
 //MongoDB Configuration
 mongoose
@@ -30,6 +33,7 @@ mongoose.connection.on('connected', () => {
 });
 
 app.use('/api/categories', require('./routes/category.route'));
+app.use('/webhook', require('./routes/webhook.route'));
 app.use('/api/courses', require('./routes/course.route'));
 
 // view engine setup
