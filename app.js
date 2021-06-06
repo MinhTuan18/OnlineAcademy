@@ -13,7 +13,7 @@ app.use(express.json());
 
 //MongoDB Configuration
 mongoose
-  .connect(process.env.connectionStringMongoDB || 'localhost:27017', {
+  .connect(process.env.MONGODB_URI || 'localhost:27017', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
@@ -30,10 +30,7 @@ mongoose.connection.on('connected', () => {
 });
 
 app.use('/api/categories', require('./routes/category.route'));
-
-
-
-
+app.use('/api/courses', require('./routes/course.route'));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
