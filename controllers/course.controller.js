@@ -1,7 +1,5 @@
 const courseModel = require('../models/course.model');
 
-
-
 exports.getCourseByCategoryID = (req, res) => {
     const categoryID  = req.params.id;
     if (!categoryID) {
