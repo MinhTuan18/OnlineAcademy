@@ -13,5 +13,7 @@ router.patch('/:id', courseController.updateCourse);
 router.delete('/:id', courseController.deleteCourse);
 
 router.get('/category/:id', courseController.getCourseByCategoryID);
-router.get('/search/:courseTitle', courseController.searchCourseByTitle);
+
+//router.get('/search/:courseTitle', courseController.searchCourseByTitle);
+
 module.exports = router;

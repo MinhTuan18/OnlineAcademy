@@ -11,7 +11,7 @@ const app = express();
 dotenv.config();
 
 app.use(express.json());
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 //MongoDB Configuration
@@ -35,6 +35,7 @@ mongoose.connection.on('connected', () => {
 app.use('/api/categories', require('./routes/category.route'));
 app.use('/webhook', require('./routes/webhook.route'));
 app.use('/api/courses', require('./routes/course.route'));
+app.use('/api/users', require('./routes/user.route'));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
