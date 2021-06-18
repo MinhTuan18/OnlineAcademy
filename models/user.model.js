@@ -54,7 +54,7 @@ module.exports = {
     //   return newUser;
     // });
     const result = await newUser.save();
-    return result;
+    return result.toObject();
   },
 
   async checkEmailExist(email) {
@@ -63,5 +63,10 @@ module.exports = {
       return false;
     }
     return true;
+  },
+
+  async updateUserProfile(id, userInfo) {
+    const result = await this.findByIdAndUpdate({_id: id}, userInfo, {new: true});
+    return result;
   }
 };

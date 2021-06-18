@@ -1,5 +1,7 @@
-const userModel = require('../models/user.model');
 const bcrypt = require('bcryptjs');
+
+const userModel = require('../models/user.model');
+const nodeMailer = require('../middlewares/node-mailer.mdw');
 
 module.exports = {
   getAllUsers: async (req, res) => {
@@ -43,9 +45,26 @@ module.exports = {
       delete newUser.password;
       console.log(newUser);
 
+      //test send mail
+      const result = await nodeMailer.sendOTP(newUser.email, 123123);
+      if (result.success) {
+        console.log('Send mail success');
+      } else {
+        console.log('Send mail failed');
+        console.log(result.error);
+      }
+      
       res.status(201).json(newUser);
     } catch (error) {
-      res.status(500).json(error.message);
+       res.status(500).json(error.message);
+    }
+  },
+
+  updateProfile: async (req, res) => {
+    const userInfo = req.body;
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json("User ID is required!!!");
     }
   }
 }
