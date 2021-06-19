@@ -66,7 +66,7 @@ module.exports = {
   },
 
   async updateUserProfile(id, userInfo) {
-    const result = await this.findByIdAndUpdate({_id: id}, userInfo, {new: true});
-    return result;
+    const result = await Users.findByIdAndUpdate({_id: id}, userInfo, {new: true});
+    return result.toObject();
   }
 };

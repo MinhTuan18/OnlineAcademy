@@ -66,5 +66,22 @@ module.exports = {
     if (!id) {
       return res.status(400).json("User ID is required!!!");
     }
+
+    try {
+      const user = await userModel.updateUserProfile(id, userInfo);
+      delete user.password;
+
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json(error.message);
+    }
+  },
+
+  changePassword: async (req, res) => {
+    const {oldPassword, newPassword} = req.body;
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json();
+    }
+    
   }
 }
