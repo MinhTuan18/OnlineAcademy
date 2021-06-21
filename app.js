@@ -36,6 +36,7 @@ app.use('/api/categories', require('./routes/category.route'));
 app.use('/webhook', require('./routes/webhook.route'));
 app.use('/api/courses', require('./routes/course.route'));
 app.use('/api/users', require('./routes/user.route'));
+app.use('/api/otp', require('./routes/otp.route'));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
