@@ -8,6 +8,7 @@ router.get('/:id', userController.getUserById);
 
 router.post('/', userController.addNewUser);
 
-router.post('/:id', userController.updateProfile);
+router.put('/:id', userController.updateProfile);
 
+router.post('/block-user', userController.blockUser);
 module.exports = router;

@@ -22,7 +22,10 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 
@@ -68,5 +71,10 @@ module.exports = {
   async updateUserProfile(id, userInfo) {
     const result = await Users.findByIdAndUpdate({_id: id}, userInfo, {new: true});
     return result.toObject();
+  },
+
+  async blockUser(id, status) {
+    const result = await Users.findByIdAndUpdate({_id: id}, {isBlocked: status}, {new: true});
+    return result;
   }
 };

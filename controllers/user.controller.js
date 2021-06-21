@@ -83,5 +83,23 @@ module.exports = {
       return res.status(400).json();
     }
     
+  },
+
+  blockUser: async (req, res) => {
+    const {id, status} = req.body;
+    if (!id) {
+      return res.status(400).json('User ID is required!');
+    }
+    try {
+      const result = await userModel.blockUser(id, status);
+      if (result) {
+        res.status(200).json();
+      }
+      else {
+        res.status(204).json();
+      }
+    } catch (error) {
+      res.status(500).json(error.message);
+    }
   }
 }
