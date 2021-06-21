@@ -5,7 +5,9 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const { userRoute, authRoute } = require('./routes');
+
 
 const app = express();
 dotenv.config();
@@ -35,8 +37,10 @@ mongoose.connection.on('connected', () => {
 app.use('/api/categories', require('./routes/category.route'));
 app.use('/webhook', require('./routes/webhook.route'));
 app.use('/api/courses', require('./routes/course.route'));
-app.use('/api/users', require('./routes/user.route'));
 app.use('/api/otp', require('./routes/otp.route'));
+app.use('/api/users', userRoute);
+app.use('/api/auth', authRoute);
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

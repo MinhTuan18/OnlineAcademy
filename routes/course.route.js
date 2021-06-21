@@ -1,19 +1,31 @@
 const express = require('express');
-const courseController = require('../controllers/course.controller');
+const { courseController } = require('../controllers');
 const router = express.Router();
 
-router.get('/', courseController.getAllCourses);
+router
+  .route('/')
+  .get(courseController.getCourses)
+  .post(courseController.createCourse);
 
-router.get('/:id', courseController.getCourseById);
+router
+  .route('/:id')
+  .get(courseController.getCourse)
+  .patch(courseController.updateCourse)
+  .delete(courseController.deleteCourse);
 
-router.post('/', courseController.addCourse);
+// router.get('/:id', courseController.getCourseById);
 
-router.patch('/:id', courseController.updateCourse);
+// router.post('/', courseController.addCourse);
 
-router.delete('/:id', courseController.deleteCourse);
+// router.patch('/:id', courseController.updateCourse);
 
-router.get('/category/:id', courseController.getCourseByCategoryID);
+//router.get('/category/:id', courseController.getCourseByCategoryID);
 
 //router.get('/search/:courseTitle', courseController.searchCourseByTitle);
 
+// router.delete('/:id', courseController.deleteCourse);
+
+// router.get('/category/:id', courseController.getCourseByCategoryID);
+
+// router.get('/search/:courseTitle', courseController.searchCourseByTitle);
 module.exports = router;
