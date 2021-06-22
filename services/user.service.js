@@ -60,7 +60,8 @@ const getUserById = async (id) => {
 };
   
 const addNewUser = async (user) => {
-	const newUser = new Users(user);
+    user.password = bcrypt.hashSync(user.password, 10);
+	const newUser = new User(user);
 	const result = await newUser.save();
 	return result.toObject();
 };

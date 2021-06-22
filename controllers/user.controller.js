@@ -31,20 +31,20 @@ const getUserById = async (req, res) => {
 
 const addNewUser = async (req, res) => {
   const user = req.body;
-  if (!user.email || !user.password || !user.fullName) {
+  if (!user.email || !user.password || !user.name) {
     return res.status(400).json();
   }
   try {
-    const isEmailExist = await userService.checkEmailExist(user.email); //Check email exist
+    const isEmailExist = await userService.isEmailTaken(user.email); //Check email exist
     if (isEmailExist) {
       return res.status(400).json(`Email ${user.email} exist!`);
     }
-    user.password = bcrypt.hashSync(user.password, 10);
 
     const newUser = await userService.addNewUser(user);
     delete newUser.password;
     console.log(newUser);
 
+    /*
     //test send mail
     const result = await nodeMailer.sendOTP(newUser.email, 123123);
     if (result.success) {
@@ -53,7 +53,7 @@ const addNewUser = async (req, res) => {
       console.log('Send mail failed');
       console.log(result.error);
     }
-    
+    */
     res.status(201).json(newUser);
   } catch (error) {
       res.status(500).json(error.message);
