@@ -1,11 +1,17 @@
 const mongoose = require('mongoose');
 
-const CategorySchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
+const CategorySchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
   },
-});
+  {
+    timestamps: true,
+    collection: 'categories',
+  }
+);
 
 CategorySchema.statics.addCategory = function (categoryName) {
   const newCategory = new this({
