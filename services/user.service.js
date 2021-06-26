@@ -34,7 +34,6 @@ const createUser = async (userBody) => {
         //console.log(user);
         return user;
     } catch (error) {
-        //console.log(error);
         throw new ApiError(httpStatus.BAD_REQUEST, error.message);
     }
 };

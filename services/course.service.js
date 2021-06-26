@@ -35,8 +35,7 @@ const getCourseById = async (courseId) => {
  * @returns {Promise<Course>}
 **/
 const createCourse = async (courseInfo) => {
-    const course = await Course.create(courseInfo);
-    return course;      
+    return await Course.create(courseInfo);
 };
 
 /**
