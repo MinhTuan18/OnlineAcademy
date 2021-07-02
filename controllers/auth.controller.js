@@ -1,5 +1,4 @@
-const { authService } = require('../services');
-const jwt = require('jsonwebtoken');
+const { authService, tokenService } = require('../services');
 const randomstring = require('randomstring');
 const rftokenSize = 70;
 
@@ -8,14 +7,10 @@ const login = async (req, res) => {
     //console.log(email + password);
     try {
         const user = await authService.loginWithEmailAndPassword(email, password);
-        const payload = { userId: user._id };
-        const opts = { expiresIn: 10*60 };
-        const accessToken = jwt.sign(payload, 'SECRET_CAT', opts);
-        // const refreshToken = randomstring.generate(rftokenSize);
-        // await clientModel.updateRfToken(client.id, refreshToken);
-        //console.log(user);
-        // const tokens = await tokenService.generateAuthTokens(user);
-        res.status(200).json({ message: 'Successfully Logged In', data:  { user, accessToken } });
+        console.log(user);
+        const accessToken = await tokenService.generateAuthTokens(user);
+        console.log(accessToken);
+        res.status(200).json({ message: 'Successfully Logged In', data:  { user, accessToken: accessToken.token, expiresIn: accessToken.expires } });
     } catch (error) {
         res.json(error);
     }

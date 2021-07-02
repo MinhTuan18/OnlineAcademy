@@ -1,12 +1,13 @@
-const categoryModel = require('../models/category.model');
+const { categoryService } = require('../services');
 
-module.exports = {
-  addNewCategory: function (req, res) {
-    const name  = req.body.name;
-    if (!name){
-      return res.status(400).json("Category name is required!");
-    }
-    const category = categoryModel.addnewCategory(name);
+const createCategory = async (req, res) => {
+  const categoryBody  = req.body;
+  // // console.log(name);
+  // if (!name){
+  //   return res.status(400).json("Category name is required!");
+  // }
+  try {
+    const category = await categoryService.createCategory(categoryBody);
     if (!category && !category.id){
       return res.status(500).json("Please try again later");
     }
@@ -14,7 +15,13 @@ module.exports = {
       message: "Create category successfully!",
       data: category,
     });
-  },
+  } catch (error) {
+    res.status(400).json(error);
+  }
+}
+
+module.exports = {
+  createCategory,
 
   getAllCategory: async function (req, res) {
     const listCategory = await categoryModel.getAllCategory();

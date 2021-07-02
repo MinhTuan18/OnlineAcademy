@@ -5,4 +5,8 @@ module.exports.authService = require('./auth.service');
 module.exports.adminService = require('./admin.service');
 module.exports.otpService = require('./otp.service');
 module.exports.nodemailerService = require('./nodemailer.service');
+module.exports.tokenService = require('./token.service');
+
+
+
 
