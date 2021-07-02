@@ -1,10 +1,11 @@
-const mongoose = require('mongoose');
-const { User } = require('../models');
-const ApiError = require('../utils/ApiError');
 const bcrypt = require('bcryptjs');
 const httpStatus = require('http-status');
 
+const otpService = require('./otp.service');
+const mailer = require('./nodemailer.service');
 
+const { User } = require('../models');
+const ApiError = require('../utils/ApiError');
 /**
  * Check if email is taken
  * @param {string} email - The user's email
@@ -31,8 +32,13 @@ const createUser = async (userBody) => {
     try {
         userBody.password = bcrypt.hashSync(userBody.password, 10);
         const user = await User.create(userBody);
+        const {otp, hash} = otpService.generateOTP(user.email);
+        console.log(otp, hash);
+
+        //send mail after create account
+        mailer.sendOTP(user.email, otp);
         //console.log(user);
-        return user;
+        return { user, hash };
     } catch (error) {
         //console.log(error);
         throw new ApiError(httpStatus.BAD_REQUEST, error.message);
@@ -48,8 +54,14 @@ const getUserByEmail = async (email) => {
     return User.findOne({ email });
 };
 
+const updateUserProfile = async (id, userInfo) => {
+	const result = await User.findByIdAndUpdate({_id: id}, userInfo, {new: true});
+	return result.toObject();
+};
+
 module.exports = {
     isEmailTaken,
     createUser,
     getUserByEmail,
+    updateUserProfile,
 }

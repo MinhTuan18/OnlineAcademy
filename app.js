@@ -6,7 +6,7 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
-const { userRoute, authRoute } = require('./routes');
+const { userRoute, authRoute, adminRoute, categoryRoute, courseRoute } = require('./routes');
 
 
 const app = express();
@@ -34,11 +34,12 @@ mongoose.connection.on('connected', () => {
   app.emit('app_started');
 });
 
-app.use('/api/categories', require('./routes/category.route'));
+app.use('/api/categories', categoryRoute);
 app.use('/webhook', require('./routes/webhook.route'));
-app.use('/api/courses', require('./routes/course.route'));
+app.use('/api/courses', courseRoute);
 app.use('/api/users', userRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/admin', adminRoute);
 
 
 // view engine setup
