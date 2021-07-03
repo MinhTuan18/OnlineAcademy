@@ -5,15 +5,15 @@ const router = express.Router();
 
 router
   .route('/')
-  .post(auth, categoryController.createCategory);
+  .post( categoryController.createCategory);
 
-// router.get('/', categoryController.getAllCategory);
+router.get('/', categoryController.getAllCategory);
 
-// router.get('/:id', categoryController.getCategoryById);
+router.get('/:id', categoryController.getCategoryById);
 
 
-// router.post('/:id', auth, categoryController.updateCategory);
+router.post('/:id', auth, categoryController.updateCategory);
 
-// router.delete('/:id', auth, categoryController.deleteCategory);
+router.delete('/:id', categoryController.deleteCategory);
 
 module.exports = router;

@@ -13,7 +13,7 @@ const CourseSchema = new mongoose.Schema(
         category: {
             type: mongoose.SchemaTypes.ObjectId,
             ref: 'Category',
-            required: [true, 'Course Ctegory Is Required'],
+            required: [true, 'Course Category Is Required'],
         },
         thumbnailImageUrl: {
             type: String, 

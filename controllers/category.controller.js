@@ -24,7 +24,7 @@ module.exports = {
   createCategory,
 
   getAllCategory: async function (req, res) {
-    const listCategory = await categoryModel.getAllCategory();
+    const listCategory = await categoryService.getCategories();
     return res.status(200).json(listCategory);
   },
   
@@ -34,7 +34,7 @@ module.exports = {
       return res.status(400).json("Category Id is required");
     }
     try {
-      const category = await categoryModel.getCategoryById(id);
+      const category = await categoryService.getCategoryById(id);
       if (!category){
         return res.status(204).json();
       }
@@ -54,7 +54,7 @@ module.exports = {
       return res.status(400).json("Category name is required!");
     }
     try {
-      const category = await categoryModel.updateCategory(id, name);
+      const category = await categoryService.updateCategoryById(id, name);
       if (!category){
         return res.status(204).json();
       }
@@ -72,13 +72,13 @@ module.exports = {
     const id = req.params.id;
     console.log(id);
     try {
-      const category = await categoryModel.deleteCategory(id);
+      const category = await categoryService.deleteCategoryById(id);
       if (!category) {
         return res.status(204).json();
       }
     return res.status(200).json("Delete category successfully");
     } catch (error) {
-      return res.status(500).json(error.message);
+      return res.status(error.statusCode || 500).json(error.message);
     }
     
   }
