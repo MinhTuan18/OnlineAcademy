@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
-const { Category } = require('../models');
+const { Category, Course } = require('../models');
+const ApiError = require('../utils/ApiError');
+const httpStatus = require('http-status');
 
 /**
  * Create a category
@@ -46,7 +48,11 @@ const updateCategoryById = async (catId, updateBody) => {
  * @param {ObjectId} catId
  * @returns {Promise<category>}
 **/
-const deleteCourseById = async (catId) => {
+const deleteCategoryById = async (catId) => {
+    const courses = await Course.find({ category: mongoose.Types.ObjectId(catId) });
+    if (courses && courses.length) {
+        throw new ApiError('This Category have some courses!', httpStatus.BAD_REQUEST);
+    }
     return await Category.findByIdAndDelete(mongoose.Types.ObjectId(catId));
 };
 
@@ -55,5 +61,5 @@ module.exports = {
     getCategoryById,
     getCategories,
     updateCategoryById, 
-    deleteCourseById,
+    deleteCategoryById,
 }

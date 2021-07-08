@@ -35,12 +35,16 @@ const UserSchema = new mongoose.Schema(
             trim: true,
         },
         role: {
-            // ['user', 'instructor', 'admin']
             type: String,
+            enum: ['user', 'instructor', 'admin'],
             trim: true,
             default: 'user',
         },
         isActivated: {
+            type: Boolean,
+            default: false,
+        },
+        isBlocked: {
             type: Boolean,
             default: false,
         },
