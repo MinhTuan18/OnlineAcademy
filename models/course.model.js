@@ -20,11 +20,11 @@ const CourseSchema = new mongoose.Schema(
             trim: true,
             default: '',
         },
-        // instructor: {
-        //     type: mongoose.SchemaTypes.ObjectId,
-        //     ref: 'Instructor',
-        //     required: true,
-        // },
+        instructor: {
+            type: mongoose.SchemaTypes.ObjectId,
+            ref: 'Instructor',
+            required: true,
+        },
         shortDesc: {
             type: String, 
             default: '',

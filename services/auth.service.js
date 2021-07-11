@@ -20,12 +20,17 @@ const loginWithEmailAndPassword = async (email, password) => {
     if (!user) {
         throw new ApiError('User Not Existed', httpStatus.BAD_REQUEST);
     }
+    if (!user.isActivated) {
+        throw new ApiError('User is not activated', httpStatus.UNAUTHORIZED);
+    }
+    if (user.isBlocked) {
+        throw new ApiError('User is blocked', httpStatus.FORBIDDEN);
+    }
     if (!bcrypt.compareSync(password, user.password)) {
         throw new ApiError('Incorrect Password', httpStatus.BAD_REQUEST);
     }
     return user;
 };
-
 
 module.exports = {
   loginWithEmailAndPassword,

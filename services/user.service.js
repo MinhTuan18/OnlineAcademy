@@ -1,8 +1,6 @@
 const bcrypt = require('bcryptjs');
 const httpStatus = require('http-status');
-
-// const otpService = require('./otp.service');
-// const mailer = require('./nodemailer.service');
+const otpService = require('./otp.service');
 
 const { User } = require('../models');
 const ApiError = require('../utils/ApiError');
@@ -58,9 +56,37 @@ const updateUserProfile = async (id, userInfo) => {
 	return result.toObject();
 };
 
+const activatedAccount = async (email, otp, hash) => {
+    if (!email || !otp || !hash) {
+        throw new ApiError('', httpStatus.BAD_REQUEST);
+    }
+    const user = await getUserByEmail(email);
+    if (!user) {
+        throw new ApiError('Email not exist!', httpStatus.BAD_REQUEST);
+    }
+    if (user.isActivated) {
+        throw new ApiError('You have been activated', httpStatus.BAD_REQUEST);
+    }
+    const optVerify = otpService.verifyOtp(otp, hash, user.email);
+    if (!optVerify) {
+        throw new ApiError('OTP Incorrect', httpStatus.BAD_REQUEST);
+    }
+    const result = await User.findByIdAndUpdate({_id: user.id}, { isActivated: true }, { new: true });
+    return result;
+};
+
+const changePassword = async (user, oldPassword, newPassword) => {
+    if (!bcrypt.compareSync(oldPassword, user.password)) {
+        throw new ApiError('Incorrect Password', httpStatus.BAD_REQUEST);
+    }
+    const paswordHash = bcrypt.hashSync(newPassword, 10);
+    return await User.findByIdAndUpdate({_id: user.id}, {password: paswordHash}, {new: true});
+}
 module.exports = {
     isEmailTaken,
     createUser,
     getUserByEmail,
     updateUserProfile,
+    activatedAccount,
+    changePassword
 }
