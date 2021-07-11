@@ -1,0 +1,17 @@
+{
+    "_id": {
+      "$oid": "60bab0f017f856177476c555"
+    },
+    "coverImage": "https://www.portugaltextil.com/wp-content/uploads/2020/04/Forma%C3%A7%C3%A3o_6abril2020-2.jpg",
+    "tutorID": "",
+    "shortDesc": "Các bước và kỹ thuật để tạo nên một ứng dụng di động IOS mức độ cơ bản",
+    "detailDesc": "",
+    "rating": 3,
+    "fee": 499000,
+    "discount": 0.7,
+    "status": "Full",
+    "title": "Lập trình IOS",
+    "__v": 0,
+    "numOfRatings": 4,
+    "numOfRegistrations": 1
+  }
