@@ -1,6 +1,6 @@
 const dotenv = require('dotenv');
 const path = require('path');
-dotenv.config({ path: path.join(__dirname, '../../.env') });
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 module.exports = {
     port: process.env.PORT,
@@ -18,5 +18,14 @@ module.exports = {
         // refreshExpirationDays: envVars.JWT_REFRESH_EXPIRATION_DAYS,
         // resetPasswordExpirationMinutes: envVars.JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
         // verifyEmailExpirationMinutes: envVars.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
+    },
+    otp: {
+        durationInMinute: process.env.DURATION_IN_MINUTE,
+    },
+    nodemailer: {
+        clientId: process.env.NODEMAILER_CLIENT_ID,
+        email: process.env.NODEMAILER_EMAIL,
+        rfToken: process.env.NODEMAILER_RFTOKEN,
+        secret: process.env.NODEMAILER_SECRET,
     },
 }

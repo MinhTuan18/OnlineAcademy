@@ -67,27 +67,6 @@ UserSchema.set('toObject', { getters: true });
 UserSchema.set('toJSON', { getters: true });
 UserSchema.plugin(mongoosePaginate);
 
-// /**
-//  * Check if password matches the user's password
-//  * @param {string} password
-//  * @returns {Promise<boolean>}
-// **/
-// UserSchema.methods.isPasswordCorrect = async (password) => {
-//     const user = this;
-//     console.log(user);
-//     console.log(password);
-//     return bcrypt.compare(password, user.password);
-// };
-
-// // Hash password before saving new user
-// UserSchema.pre('save', async (next) => {
-//     const user = this;
-//     if (user.isModified('password')) {
-//         user.password = await bcrypt.hash(user.password, 10);
-//     }
-//     next();
-// });
-
 /**
  * @typedef User
 **/

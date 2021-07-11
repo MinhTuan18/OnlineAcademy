@@ -2,7 +2,11 @@ const sha256 = require('js-sha256');
 
 const { nodemailerService } = require('../services');
 
-const DURATION_IN_MINUTE = 1
+const envConfigs = require('../configs/enviroment-config');
+
+const ApiError = require('../utils/ApiError');
+
+// const DURATION_IN_MINUTE = 1
 
 /*  sendOTP
     request:
@@ -15,8 +19,20 @@ const DURATION_IN_MINUTE = 1
         hash
     }
  */
-const sendOtp = function (req, res) {
-    const email = req.body.email
+
+const generateOTP = (email) => {
+    const otp = Math.floor(100000 + Math.random() * 899999)
+    const duration = envConfigs.otp.durationInMinute * 60 * 1000
+    const expiresAt = Date.now() + duration
+    
+    const data = `${email}.${otp}.${expiresAt}`
+    const dataHash = sha256.hex(data)
+    const hash = `${dataHash}.${expiresAt}`
+    return {otp, hash};
+}
+
+const sendOtp =  (req, res) => {
+    const { email } = req.body;
     if (!email) {
         return res.status(400).json({
             msg: 'Missing request body'
@@ -82,17 +98,8 @@ const verifyOtp = function (req, res) {
     }
 }
 
-const generateOTP = (email) => {
-  const otp = Math.floor(100000 + Math.random() * 899999)
-  const duration = DURATION_IN_MINUTE * 60 * 1000
-  const expiresAt = Date.now() + duration
-
-  const data = `${email}.${otp}.${expiresAt}`
-  const dataHash = sha256.hex(data)
-  const hash = `${dataHash}.${expiresAt}`
-  return {otp, hash};
-}
-
 module.exports = {
-    sendOtp, verifyOtp, generateOTP,
+    sendOtp, 
+    verifyOtp, 
+    generateOTP,
 } 

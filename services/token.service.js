@@ -1,11 +1,11 @@
 const moment = require('moment');
 const jwt = require('jsonwebtoken');
-const envCconfigs = require('../configs/enviroment-config');
+const envConfigs = require('../configs/enviroment-config');
 const { User } = require('../models');
 const ApiError = require('../utils/ApiError');
 const httpStatus = require('http-status');
-const accessExpirationMinutes = 30;
-const jwt_secret = 'secret_cat';
+// const accessExpirationMinutes = 30;
+// const jwt_secret = 'secret_cat';
 /**
  * Generate token
  * @param {ObjectId} userId
@@ -22,8 +22,8 @@ const generateToken = (userId, expires, type) => {
         exp: expires.unix(),
         type,
     };
-    console.log(payload);
-    return jwt.sign(payload, jwt_secret);
+    // console.log(payload);
+    return jwt.sign(payload, envConfigs.jwt.secret);
 };
 
 /**
@@ -33,8 +33,8 @@ const generateToken = (userId, expires, type) => {
 **/
 const generateAuthTokens = (user) => {
     //console.log(user._id);
-    const accessTokenExpires = moment().add(accessExpirationMinutes, 'minutes');
-    console.log(accessTokenExpires);
+    const accessTokenExpires = moment().add(envConfigs.jwt.accessExpirationMinutes, 'minutes');
+    // console.log(accessTokenExpires);
 
     const accessToken = generateToken(user._id, accessTokenExpires, 'access');
     // console.log(accessToken);
@@ -54,7 +54,7 @@ const generateAuthTokens = (user) => {
 const verifyToken = async (token) => {
     // console.log(token);
     try {
-        const payload = jwt.verify(token, jwt_secret);
+        const payload = jwt.verify(token, envConfigs.jwt.secret);
         // console.log(payload);
 
         const user = await User.findById({ _id: payload.sub });

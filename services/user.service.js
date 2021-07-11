@@ -1,8 +1,8 @@
 const bcrypt = require('bcryptjs');
 const httpStatus = require('http-status');
 
-const otpService = require('./otp.service');
-const mailer = require('./nodemailer.service');
+// const otpService = require('./otp.service');
+// const mailer = require('./nodemailer.service');
 
 const { User } = require('../models');
 const ApiError = require('../utils/ApiError');
@@ -27,20 +27,20 @@ const createUser = async (userBody) => {
     // console.log(await isEmailTaken(userBody.email));
     if (await isEmailTaken(userBody.email)) {
         //console.log('2');
-        throw new ApiError(httpStatus.BAD_REQUEST, 'Email has been already taken');
+        throw new ApiError('Email has been already taken', httpStatus.BAD_REQUEST);
     }
     try {
         userBody.password = bcrypt.hashSync(userBody.password, 10);
         const user = await User.create(userBody);
-        const {otp, hash} = otpService.generateOTP(user.email);
-        console.log(otp, hash);
+        // const {otp, hash} = otpService.generateOTP(user.email);
+        // // console.log(otp, hash);
 
-        //send mail after create account
-        mailer.sendOTP(user.email, otp);
+        // //send mail after create account
+        // mailer.sendOTP(user.email, otp);
         //console.log(user);
-        return { user, hash };
+        return user;
     } catch (error) {
-        throw new ApiError(httpStatus.BAD_REQUEST, error.message);
+        throw new ApiError(error.message, httpStatus.INTERNAL_SERVER_ERROR);
     }
 };
 
@@ -50,7 +50,7 @@ const createUser = async (userBody) => {
  * @returns {Promise<User>}
 **/
 const getUserByEmail = async (email) => {
-    return User.findOne({ email });
+    return await User.findOne({ email });
 };
 
 const updateUserProfile = async (id, userInfo) => {
