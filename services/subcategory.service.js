@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { Category, SubCategory } = require('../models');
+const { SubCategory, Course } = require('../models');
 const ApiError = require('../utils/ApiError');
 const httpStatus = require('http-status');
 
@@ -9,7 +9,7 @@ const httpStatus = require('http-status');
  * @returns {Promise<Category>}
 **/
 const createCategory = async (categoryInfo) => {
-    return await Category.create(categoryInfo);
+    return await SubCategory.create(categoryInfo);
 };
 
 /**
@@ -18,7 +18,7 @@ const createCategory = async (categoryInfo) => {
  * @returns {Promise<Category>}
 **/
 const getCategoryById = async (catId) => {
-    return await Category.findById(mongoose.Types.ObjectId(catId));
+    return await SubCategory.findById(mongoose.Types.ObjectId(catId));
 };
 
 /**
@@ -26,7 +26,7 @@ const getCategoryById = async (catId) => {
  * @returns {Promise<Category>}
 **/
 const getCategories = async () => {
-    return await Category.paginate();
+    return await SubCategory.paginate();
 };
 
 /**
@@ -40,7 +40,7 @@ const updateCategoryById = async (catId, updateBody) => {
         new: true,
         omitUndefined: true
     }
-    return await Category.findByIdAndUpdate(mongoose.Types.ObjectId(catId),{ name: updateBody }, options);
+    return await SubCategory.findByIdAndUpdate(mongoose.Types.ObjectId(catId), updateBody, options);
 };
 
 /**
@@ -49,17 +49,27 @@ const updateCategoryById = async (catId, updateBody) => {
  * @returns {Promise<category>}
 **/
 const deleteCategoryById = async (catId) => {
-    const subs = await SubCategory.find({ category: mongoose.Types.ObjectId(catId) });
-    if (subs && subs.length) {
-        throw new ApiError('This Category have some subcategories!', httpStatus.BAD_REQUEST);
+    const courses = await Course.find({ category: mongoose.Types.ObjectId(catId) });
+    if (courses && courses.length) {
+        throw new ApiError('This Category have some courses!', httpStatus.BAD_REQUEST);
     }
-    return await Category.findByIdAndDelete(mongoose.Types.ObjectId(catId));
+    return await SubCategory.findByIdAndDelete(mongoose.Types.ObjectId(catId));
+};
+
+const querySubCategories = async (filter, options) => {
+    const { subcategory } = filter;
+    if (subcategory) {
+        filter.category = mongoose.Types.ObjectId(category);
+    }
+    const subcategories = await SubCategory.paginate(filter, options);
+    return subcategories;
 };
 
 module.exports = {
     createCategory,
     getCategoryById,
     getCategories,
-    updateCategoryById, 
+    updateCategoryById,
     deleteCategoryById,
+    querySubCategories,
 }

@@ -12,7 +12,7 @@ const CourseSchema = new mongoose.Schema(
         },
         category: {
             type: mongoose.SchemaTypes.ObjectId,
-            ref: 'Category',
+            ref: 'SubCategory',
             required: [true, 'Course Category Is Required'],
         },
         thumbnailImageUrl: {
