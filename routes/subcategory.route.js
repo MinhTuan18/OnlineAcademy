@@ -5,16 +5,22 @@ const router = express.Router();
 
 router
   .route('/')
+  .get(subcategoryController.getSubCategories)
   .post(auth, subcategoryController.createCategory);
 
+router
+  .route('/:id')
+  .get(subcategoryController.getCategoryById)
+  .patch(auth, subcategoryController.updateCategory)
+  .delete(auth, subcategoryController.deleteCategory);
 
-router.get('/:id', subcategoryController.getCategoryById);
+// router.get('/:id', subcategoryController.getCategoryById);
 
-router.get('/', subcategoryController.getSubCategories);
+// // router.get('/', subcategoryController.getSubCategories);
 
 
-router.post('/:id', auth, subcategoryController.updateCategory);
+// router.post('/:id', auth, subcategoryController.updateCategory);
 
-router.delete('/:id', auth, subcategoryController.deleteCategory);
+// router.delete('/:id', auth, subcategoryController.deleteCategory);
 
 module.exports = router;
