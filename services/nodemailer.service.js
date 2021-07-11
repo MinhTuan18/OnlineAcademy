@@ -37,7 +37,7 @@ const transporter = nodeMailer.createTransport({
 module.exports = {
   sendOTP: (receiverEmail, otp) => {
     const mailOptions = {
-      from: "Online Academy",
+      from: `"Online Academy" ${email}`,
       to: `${receiverEmail}`,
       subject: 'Activate Online Academy Account',
       text: `Provide following OTP to activate your account: ${otp} \n  If this is not you, ignore this email!`,
