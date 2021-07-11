@@ -6,7 +6,7 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
-const { userRoute, authRoute, adminRoute, categoryRoute, courseRoute } = require('./routes');
+const { userRoute, authRoute, adminRoute, subcategoryRoute, courseRoute, categoryRoute } = require('./routes');
 
 
 const app = express();
@@ -35,6 +35,7 @@ mongoose.connection.on('connected', () => {
 });
 
 app.use('/api/categories', categoryRoute);
+app.use('/api/sub-categories', subcategoryRoute);
 app.use('/webhook', require('./routes/webhook.route'));
 app.use('/api/courses', courseRoute);
 app.use('/api/users', userRoute);
