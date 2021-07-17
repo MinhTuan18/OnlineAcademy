@@ -62,9 +62,23 @@ const getFeedbackById = async (req, res) => {
   }
 }
 
+const deleteFeedback = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const result = await feedbackService.deleteFeedBack(id);
+    if(!result) {
+      return res.status(httpStatus.NO_CONTENT).json('Feedback not found');
+    }
+    res.status(httpStatus.OK).json('Delelte feedback successfully');
+  } catch(error) {
+    return res.status(error.statusCode || 500).json(error.message);
+  }
+}
+
 module.exports = {
   createFeedback,
   queryFeedback,
   updateFeedback,
-  getFeedbackById
+  getFeedbackById,
+  deleteFeedback,
 }
