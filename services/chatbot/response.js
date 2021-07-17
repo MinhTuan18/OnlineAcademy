@@ -1,5 +1,7 @@
 // const request = require('request');
-// const categoryService = require('../../services/category.service')
+const categoryService = require('../../services/category.service')
+const subCategoryService = require('../../services/subcategory.service')
+const courseService = require('../../services/course.service')
 
 const { json } = require('body-parser');
 
@@ -43,21 +45,28 @@ const search = async function (searchString) {
         }
     }
 
-    const listCourses = await require('./courses.json');
+    let filter = {}
+    let options = {}
+    if (searchString !== '') filter.$text = { $search: searchString };
+
+    const data = await courseService.queryCourses(filter, options);
+    const listCourses = data.docs
+
+    // console.log(listCourses)
 
     for (let c of listCourses) {
         response.attachment.payload.elements.push({
-            "title": c.title + searchString,
+            "title": c.title,
             // "subtitle": c.shortDesc,
             // 'text': `${course.title.toUpperCase()}\n - ${course.shortDesc}\n - long des\n - lv${categoryId}\n - gv\n - Điểm đánh giá: ${course.rating} (${course.numOfRatings})\n - Học phí: ${course.fee}VND ${course.discount != '' ? '(Đang giảm ' + course.discount + '%)' : ''}`
             // "subtitle": `${c.shortDesc}\nlv${categoryId}\ngv\nĐiểm đánh giá: ${c.rating} (${c.numOfRatings})\nHọc phí: ${c.fee}VND ${c.discount != '' ? '(Đang giảm ' + c.discount + '%)' : ''}`,
             "subtitle": `Học phí: ${c.fee}VND ${c.discount != '' ? '(giảm ' + c.discount + '%)' : ''}\n${c.shortDesc}`,
-            "image_url": c.coverImage,
+            "image_url": c.thumbnailImageUrl,
             "buttons": [
                 {
                     "type": "postback",
                     "title": "XEM CHI TIẾT KHÓA HỌC",
-                    "payload": `COURSES_LIST_${c._id.$oid}`
+                    "payload": `COURSES_LIST_${c.id}`
                 }
             ],
         })
@@ -83,9 +92,10 @@ const categories = async function () {
         }
     }
 
-    // const listCategories = await categoryService.getCategories();
-    const listCategories = await require('./categories.json');
-
+    const data = await categoryService.getCategories();
+    const listCategories = data.docs
+    // const listCategories = await require('./categories.json');
+    // console.log(listCategories)
     for (let c of listCategories) {
         response.attachment.payload.elements.push({
             "title": c.name,
@@ -93,7 +103,12 @@ const categories = async function () {
                 {
                     "type": "postback",
                     "title": "XEM DANH SÁCH KHÓA HỌC",
-                    "payload": `CATEGORIES_LIST_${c._id.$oid}`
+                    "payload": `CATEGORIES_LIST_${c.id}`
+                },
+                {
+                    "type": "postback",
+                    "title": "XEM CÁC DANH MỤC CON",
+                    "payload": `CATEGORIES_LISTSUB_${c.id}`
                 }
             ],
         })
@@ -102,6 +117,42 @@ const categories = async function () {
     return response
 }
 
+const subCategories = async function (categoryId) {
+    let response = {
+        "attachment": {
+            "type": "template",
+            "payload": {
+                "template_type": "generic",
+                "elements": []
+            }
+        }
+    }
+
+    let filter = {}
+    let options = {}
+    if (categoryId !== '') filter.category = categoryId;
+
+    const data = await subCategoryService.querySubCategories(filter, options);
+    const subCategories = data.docs
+    // const listCategories = await require('./categories.json');
+    // console.log(subCategories)
+    for (let c of subCategories) {
+        response.attachment.payload.elements.push({
+            "title": c.name,
+            "buttons": [
+                {
+                    "type": "postback",
+                    "title": "XEM DANH SÁCH KHÓA HỌC",
+                    "payload": `SUBCATEGORY_LIST_${c.id}`
+                }
+            ],
+        })
+    }
+
+    return response
+}
+
+/////////////////////////////// FIX ////////////////////////////
 const coursesByCategory = async function (categoryId) {
     let response = {
         "attachment": {
@@ -113,21 +164,80 @@ const coursesByCategory = async function (categoryId) {
         }
     }
 
-    const listCourses = await require('./courses.json');
+    let listCourses = []
+
+    let filter = {}
+    let options = {}
+    if (categoryId !== '') filter.category = categoryId;
+
+    const data = await subCategoryService.querySubCategories(filter, options);
+    const subCategories = data.docs
+
+    for(let sub of subCategories) {
+        filter = {};
+        options = {}
+        filter.category = sub.id;
+        
+        const data1 = await courseService.queryCourses(filter, options);
+        listCourses.push(...data1.docs)
+    }
+    
+    // console.log(listCourses)
+
 
     for (let c of listCourses) {
         response.attachment.payload.elements.push({
-            "title": c.title + categoryId,
+            "title": c.title,
             // "subtitle": c.shortDesc,
             // 'text': `${course.title.toUpperCase()}\n - ${course.shortDesc}\n - long des\n - lv${categoryId}\n - gv\n - Điểm đánh giá: ${course.rating} (${course.numOfRatings})\n - Học phí: ${course.fee}VND ${course.discount != '' ? '(Đang giảm ' + course.discount + '%)' : ''}`
             // "subtitle": `${c.shortDesc}\nlv${categoryId}\ngv\nĐiểm đánh giá: ${c.rating} (${c.numOfRatings})\nHọc phí: ${c.fee}VND ${c.discount != '' ? '(Đang giảm ' + c.discount + '%)' : ''}`,
             "subtitle": `Học phí: ${c.fee}VND ${c.discount != '' ? '(giảm ' + c.discount + '%)' : ''}\n${c.shortDesc}`,
-            "image_url": c.coverImage,
+            "image_url": c.thumbnailImageUrl,
             "buttons": [
                 {
                     "type": "postback",
                     "title": "XEM CHI TIẾT KHÓA HỌC",
-                    "payload": `COURSES_LIST_${c._id.$oid}`
+                    "payload": `COURSES_LIST_${c.id}`
+                }
+            ],
+        })
+    }
+
+    return response
+}
+
+const coursesBySubCategory = async function (subCategoryId) {
+    let response = {
+        "attachment": {
+            "type": "template",
+            "payload": {
+                "template_type": "generic",
+                "elements": []
+            }
+        }
+    }
+
+    let filter = {};
+    let options = {}
+    if (subCategoryId !== '') filter.category = subCategoryId;
+    
+    const data = await courseService.queryCourses(filter, options);
+    const listCourses = data.docs
+    // console.log(listCourses)
+
+    for (let c of listCourses) {
+        response.attachment.payload.elements.push({
+            "title": c.title,
+            // "subtitle": c.shortDesc,
+            // 'text': `${course.title.toUpperCase()}\n - ${course.shortDesc}\n - long des\n - lv${categoryId}\n - gv\n - Điểm đánh giá: ${course.rating} (${course.numOfRatings})\n - Học phí: ${course.fee}VND ${course.discount != '' ? '(Đang giảm ' + course.discount + '%)' : ''}`
+            // "subtitle": `${c.shortDesc}\nlv${categoryId}\ngv\nĐiểm đánh giá: ${c.rating} (${c.numOfRatings})\nHọc phí: ${c.fee}VND ${c.discount != '' ? '(Đang giảm ' + c.discount + '%)' : ''}`,
+            "subtitle": `Học phí: ${c.fee}VND ${c.discount != '' ? '(giảm ' + c.discount + '%)' : ''}\n${c.shortDesc}`,
+            "image_url": c.thumbnailImageUrl,
+            "buttons": [
+                {
+                    "type": "postback",
+                    "title": "XEM CHI TIẾT KHÓA HỌC",
+                    "payload": `COURSES_LIST_${c.id}`
                 }
             ],
         })
@@ -140,15 +250,15 @@ const coursesDetail = async function (courseId) {
     let response = []
 
     ////////////
-    let course = await require('./course.json')
-
-
+    // let course = await require('./course.json')
+    const course = await courseService.getCourseById(courseId)
+    // console.log(course)
 
     response.push({
         "attachment": {
             "type": "image",
             "payload": {
-                "url": `${course.coverImage}`,
+                "url": `${course.thumbnailImageUrl}`,
                 "is_reusable": false
             }
         }
@@ -171,7 +281,7 @@ const coursesDetail = async function (courseId) {
     // })
 
     response.push({
-        'text': `*${course.title.toUpperCase()} ${courseId}*\n - ${course.shortDesc}\n - long des\n - gv\n - Điểm đánh giá: ${course.rating}/5 (${course.numOfRatings} lượt)\n - Đã đăng kí: ${course.numOfRegistrations} lượt\n - Học phí: ${course.fee}VND ${course.discount != '' ? '(Đang giảm ' + course.discount + '%)' : ''}`
+        'text': `*${course.title.toUpperCase()}*\n - ${course.shortDesc}\n - ${course.detailDesc}\n - GV\n - Điểm đánh giá: ${course.rating}/5 (${course.numOfRatings} lượt)\n - Đã đăng kí: ${course.numOfRegistrations} lượt\n - Học phí: ${course.fee}VND ${course.discount != '' ? '(Đang giảm ' + course.discount + '%)' : ''}`
     })
 
     return response
@@ -182,6 +292,8 @@ module.exports = {
     searchGuide,
     search,
     categories,
+    subCategories,
     coursesByCategory,
+    coursesBySubCategory,
     coursesDetail
 }
