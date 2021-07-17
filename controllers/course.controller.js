@@ -29,8 +29,8 @@ const getCourses = async (req, res) => {
     
     const courses = await courseService.queryCourses(filter, options);
     //console.log(courses);
-    if (courses.length === 0) {
-        return res.status(404).json({ message: 'Course Not Found'});
+    if (courses.docs.length === 0) {
+        return res.status(204).json({ message: 'Course Not Found'});
     }
     return res.status(200).json(courses);
 }
