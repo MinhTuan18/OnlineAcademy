@@ -8,6 +8,7 @@ module.exports.otpService = require('./otp.service');
 module.exports.nodemailerService = require('./nodemailer.service');
 module.exports.tokenService = require('./token.service');
 module.exports.feedbackService = require('./feedback.service');
+module.exports.registeredCourseService = require('./registeredcourse.service');
 
 
 

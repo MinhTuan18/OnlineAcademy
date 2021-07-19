@@ -6,7 +6,7 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
-const { userRoute, authRoute, adminRoute, subcategoryRoute, courseRoute, categoryRoute, feedbackRoute } = require('./routes');
+const { userRoute, authRoute, adminRoute, subcategoryRoute, courseRoute, categoryRoute, feedbackRoute, registeredCourseRoute } = require('./routes');
 
 
 const app = express();
@@ -42,7 +42,7 @@ app.use('/api/users', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/admin', adminRoute);
 app.use('/api/feedback', feedbackRoute);
-
+app.use('/api/registered-course', registeredCourseRoute);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
