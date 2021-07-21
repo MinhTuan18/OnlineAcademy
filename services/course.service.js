@@ -15,7 +15,6 @@ const queryCourses = async (filter, options) => {
     if (category) {
         filter.category = mongoose.Types.ObjectId(category);
     }
-    console.log(filter);
     const courses = await Course.paginate(filter, options);
     return courses;
 };

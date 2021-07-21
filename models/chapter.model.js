@@ -10,6 +10,7 @@ const ChapterSchema = new mongoose.Schema(
     },
     index: {
       type: Number,
+      min: 0,
     },
     name: {
       type: String,
