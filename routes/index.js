@@ -6,4 +6,4 @@ module.exports.authRoute = require('./auth.route');
 module.exports.adminRoute = require('./admin.route');
 module.exports.feedbackRoute = require('./feedback.route');
 module.exports.chapterRoute = require('./chapter.route')
-
+module.exports.watchListRoute = require('./watchlist.route');

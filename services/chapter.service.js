@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const { Chapter, Course } = require('../models');
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
