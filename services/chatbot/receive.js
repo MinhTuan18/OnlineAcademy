@@ -1,5 +1,6 @@
 const request = require('request')
 const responseRef = require('./response')
+const {deleteDiacritics} = require('../../utils/HandleDiacritics')
 
 function handleReceive(webhook_event) {
     let sender_psid = webhook_event.sender.id;
@@ -23,15 +24,27 @@ async function handleMessage(sender_psid, received_message) {
         // Create the payload for a basic text message
         if (msgTxt.toUpperCase().includes('MENU')) {
             response = responseRef.mainMenu()
-        } else if (msgTxt.toUpperCase().includes('TÌM KHÓA HỌC')) {
+
+
+            // } else if (msgTxt.toUpperCase().includes('TÌM KHÓA HỌC')) {
+            //     let searchString
+            //     if (msgTxt[msgTxt.indexOf('TÌM KHÓA HỌC') + 12] === ' ') {
+            //         searchString = msgTxt.substring(msgTxt.toUpperCase().indexOf('TÌM KHÓA HỌC') + 13)
+            //     } else {
+            //         searchString = msgTxt.substring(msgTxt.toUpperCase().indexOf('TÌM KHÓA HỌC') + 12)
+            //     }
+            //     response = await responseRef.search(searchString)
+
+        } else if (deleteDiacritics(msgTxt).toUpperCase().includes('TIM KHOA HOC')) {
             let searchString
-            if (msgTxt[msgTxt.indexOf('TÌM KHÓA HỌC') + 12] === ' ') {
-                searchString = msgTxt.substring(msgTxt.toUpperCase().indexOf('TÌM KHÓA HỌC') + 13)
+            if (msgTxt[deleteDiacritics(msgTxt).toUpperCase().indexOf('TIM KHOA HOC') + 12] === ' ') {
+                searchString = msgTxt.substring(deleteDiacritics(msgTxt).toUpperCase().indexOf('TIM KHOA HOC') + 13)
             } else {
-                searchString = msgTxt.substring(msgTxt.toUpperCase().indexOf('TÌM KHÓA HỌC') + 12)
+                searchString = msgTxt.substring(deleteDiacritics(msgTxt).toUpperCase().indexOf('TIM KHOA HOC') + 12)
             }
+            
             response = await responseRef.search(searchString)
-        } else if (msgTxt.toUpperCase().includes('DUYỆT')) {
+        } else if (deleteDiacritics(msgTxt).toUpperCase().includes('DUYET')) {
             response = await responseRef.categories()
         } else {
             response =
@@ -68,9 +81,15 @@ async function handlePayload(payload) {
         response = await responseRef.searchGuide()
     } else if (payload === 'CATEGORIES') {
         response = await responseRef.categories()
-    } else if (payload.includes('CATEGORIES_LIST_')) {
+    } else if (payload.includes('CATEGORIES_LIST_')) { // get courses from cat
         let categoryId = payload.substring(16)
         response = await responseRef.coursesByCategory(categoryId)
+    } else if (payload.includes('CATEGORIES_LISTSUB_')) { // get subcats from cat
+        let categoryId = payload.substring(19)
+        response = await responseRef.subCategories(categoryId) 
+    } else if (payload.includes('SUBCATEGORY_LIST_')) { // get courses from subcat
+        let subCategoryId = payload.substring(17)
+        response = await responseRef.coursesBySubCategory(subCategoryId) 
     } else if (payload.includes('COURSES_LIST_')) {
         let courseId = payload.substring(13)
         response = await responseRef.coursesDetail(courseId)

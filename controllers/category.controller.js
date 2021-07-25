@@ -24,8 +24,8 @@ module.exports = {
   createCategory,
 
   getAllCategory: async function (req, res) {
-    const listCategory = await categoryService.getCategories();
-    return res.status(200).json(listCategory);
+    const categories = await categoryService.queryAllCategories();
+    return res.status(200).json(categories);
   },
   
   getCategoryById: async function (req, res) {

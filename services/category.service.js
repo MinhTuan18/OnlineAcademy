@@ -22,11 +22,46 @@ const getCategoryById = async (catId) => {
 };
 
 /**
- * Get a categories
+ * Get all categories
  * @returns {Promise<Category>}
 **/
 const getCategories = async () => {
     return await Category.paginate();
+};
+
+/**
+ * Query for categories
+ * @returns {Promise<QueryResult>}
+**/
+const queryAllCategories = async () => {
+    const categories = await Category.aggregate([
+        
+        {
+            $lookup: {
+                from: 'subcategories',
+                localField: 'subCategories',
+                foreignField: '_id',
+                as: 'subCategories',
+            },
+        },
+        {
+            $addFields: {
+                'subCategories.total': { $size: '$subCategories.courses' },
+            },
+        },
+        {
+            $project: {
+                'subCategories.category': 0,
+            },
+        },
+        {
+            $addFields: {
+                total: { $sum: '$subCategories.total' },
+            },
+        },
+    ]);
+  
+    return categories;
 };
 
 /**
@@ -60,6 +95,7 @@ module.exports = {
     createCategory,
     getCategoryById,
     getCategories,
+    queryAllCategories,
     updateCategoryById, 
     deleteCategoryById,
 }

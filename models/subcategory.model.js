@@ -6,12 +6,17 @@ const SubCategorySchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      index: true,
     },
     category: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: 'Category',
       required: [true, 'Parent Category Is Required'],
-    }
+    },
+    courses: {
+      type: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Course' }],
+      default: [],
+    },
   },
   {
     timestamps: true,
