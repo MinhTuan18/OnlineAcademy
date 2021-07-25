@@ -7,6 +7,10 @@ const CategorySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    subCategories: {
+      type: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'SubCategory' }],
+      default: [],
+    },
   },
   {
     timestamps: true,

@@ -6,6 +6,7 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const { userRoute, authRoute, adminRoute, subcategoryRoute, courseRoute, categoryRoute, feedbackRoute } = require('./routes');
 
 
@@ -15,6 +16,10 @@ dotenv.config();
 app.use(express.json());
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}));
+
+// enable cors
+app.use(cors());
+app.options('*', cors());
 
 //MongoDB Configuration
 mongoose
