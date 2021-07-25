@@ -1,4 +1,5 @@
 const { courseService, categoryService} = require('../services');
+const extract = require('../utils/ExtractProperties');
 
 const getCourse = async (req, res) => {
     const courseId = req.params.id;
@@ -10,27 +11,54 @@ const getCourse = async (req, res) => {
 }
 
 const getCourses = async (req, res) => {
-    const categoryId  = req.query.catId || '';
-    //console.log(categoryId);
-    const courseTitle = req.query.title || '';
-    //console.log(courseTitle);
-    const sortBy = req.query.sortBy || '';
-    // const limit = req.query.limit || '';
-    // const page = req.query.page || '';
-    let filter = {};
-    let options = {
-        limit: req.query.limit || 10,
-        page: req.query.page || 1
+    // const categoryId  = req.query.catId || '';
+    // //console.log(categoryId);
+    // const courseTitle = req.query.title || '';
+    // //console.log(courseTitle);
+    // const sortBy = req.query.sortBy || '';
+    // // const limit = req.query.limit || '';
+    // // const page = req.query.page || '';
+    const { type } = req.query;
+    // console.log(type);
+    // let filter = {};
+    // let options = {
+    //     limit: req.query.limit || 10,
+    //     page: req.query.page || 1
+    // }
+    let filter, options, courses;
+    switch (type) {
+        case '1':
+            // console.log('OK');
+            // options = extract(req.query, ['limit', 'page']);
+            // console.log(options);
+            courses = await courseService.queryMostViewCourses();
+            // console.log(courses);
+            break; 
+        case '2':
+            // console.log('OK');
+            // options = extract(req.query, ['limit', 'page']);
+            // console.log(options);
+            courses = await courseService.queryNewestCourses();
+            console.log(courses);
+            break; 
+        default:
+            // console.log('OK');
+            filter = extract(req.query, ['title', 'category', 'subCategory']);
+            options = extract(req.query, ['sortBy', 'limit', 'page']);
+            courses = await courseService.queryCoursesAdvancedFilter(filter, options);
+            // console.log(courses);
+            break;
+            
     }
-    if (categoryId !== '') filter.category = categoryId;
-    if (courseTitle !== '') filter.$text = { $search: courseTitle };
-    //console.log(filter);
-    if (sortBy !== '') options.sort = {sortBy: 1};
+    // if (categoryId !== '') filter.category = categoryId;
+    // if (courseTitle !== '') filter.$text = { $search: courseTitle };
+    // //console.log(filter);
+    // if (sortBy !== '') options.sort = {sortBy: 1};
     
-    const courses = await courseService.queryCourses(filter, options);
-    //console.log(courses);
-    if (courses.docs.length === 0) {
-        return res.status(204).json({ message: 'Course Not Found'});
+    // const courses = await courseService.queryCourses(filter, options);
+    // //console.log(courses);
+    if (!courses || courses.length === 0) {
+        return res.status(204);
     }
     return res.status(200).json(courses);
 }
