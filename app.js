@@ -9,7 +9,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const { userRoute, authRoute, adminRoute, subcategoryRoute, courseRoute, categoryRoute, feedbackRoute } = require('./routes');
 
-
 const app = express();
 dotenv.config();
 
@@ -47,7 +46,7 @@ app.use('/api/users', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/admin', adminRoute);
 app.use('/api/feedback', feedbackRoute);
-
+app.use('/api/registered-course', registeredCourseRoute);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
