@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { userRoute, authRoute, adminRoute, subcategoryRoute, courseRoute, categoryRoute, feedbackRoute } = require('./routes');
+const { userRoute, authRoute, adminRoute, subcategoryRoute, courseRoute, categoryRoute, feedbackRoute, registeredCourseRoute } = require('./routes');
 
 const app = express();
 dotenv.config();
@@ -46,7 +46,7 @@ app.use('/api/users', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/admin', adminRoute);
 app.use('/api/feedback', feedbackRoute);
-app.use('/api/registered-course', registeredCourseRoute);
+app.use('/api/registered-courses', registeredCourseRoute);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

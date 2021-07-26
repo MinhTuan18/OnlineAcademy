@@ -17,6 +17,10 @@ const SubCategorySchema = new mongoose.Schema(
       type: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Course' }],
       default: [],
     },
+    thumbnailImageUrl: {
+      type: String,
+      default: '',
+    }
   },
   {
     timestamps: true,

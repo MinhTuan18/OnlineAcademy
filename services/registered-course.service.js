@@ -8,7 +8,7 @@ const registerCourse = async (userId, courseId) => {
   if (registeredCourse) {
     throw new ApiError('You have already regist this course', httpStatus.BAD_REQUEST);
   }
-  const result = RegisteredCourse.create({user: userId, course: courseId});
+  const result = RegisteredCourse.create({student: userId, course: courseId});
   return result;
 }
 

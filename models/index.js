@@ -3,4 +3,4 @@ module.exports.Category = require('./category.model');
 module.exports.Course = require('./course.model');
 module.exports.User = require('./user.model');
 module.exports.Feedback = require('./feedback.model');
-module.exports.RegisteredCourse = require('./registerdcourse.model');
+module.exports.RegisteredCourse = require('./registerd-course.model');
