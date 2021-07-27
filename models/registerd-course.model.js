@@ -8,7 +8,7 @@ const RegisterdCourseSchema = new mongoose.Schema(
       required: true,
       ref: 'Course',
     },
-    user: {
+    student: {
       type: mongoose.SchemaTypes.ObjectId,
       required: true,
       ref: 'User',

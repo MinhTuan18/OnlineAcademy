@@ -20,9 +20,15 @@ const createCategory = async (req, res) => {
   }
 }
 
+const getMostRegisterSubCategoriesLast7Days = async (req, res) => {
+  // console.log('OK');
+  const registeredCourses = await subcategoryService.queryMostRegisteredSubCategoryLast7Days();
+  res.status(200).json(registeredCourses);
+}
+
 module.exports = {
   createCategory,
-
+  getMostRegisterSubCategoriesLast7Days,
   getAllCategory: async function (req, res) {
     const listCategory = await subcategoryService.getCategories();
     return res.status(200).json(listCategory);
@@ -98,6 +104,6 @@ module.exports = {
         return res.status(404).json({ message: 'Course Not Found'});
     }
     return res.status(200).json(subCategories);
-}
+  }
 
 }

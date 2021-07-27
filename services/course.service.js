@@ -314,11 +314,11 @@ const queryCoursesFilterByCategory = async (filter, options) => {
 **/
 const queryMostViewCourses = async () => {
     const courses = await Course.aggregate([
-        //   {
-        //     $match: {
-        //       isBlocked: false,
-        //     },
-        //   },
+        {
+            $match: {
+                isBlocked: false,
+            },
+        },
         {
             $project: {
                 title: 1,
@@ -388,11 +388,11 @@ const queryNewestCourses = async () => {
     // isBlocked: false - published
   
     const courses = await Course.aggregate([
-        // {
-        //     $match: {
-        //         isBlocked: false,
-        //     },
-        // },
+        {
+            $match: {
+                isBlocked: false,
+            },
+        },
         {
             $project: {
                 title: 1,
@@ -470,7 +470,7 @@ const queryOutstandingCourses = async () => {
                 createdAt: {
                     $gte: start,
                 },
-                status: 2,
+                isBlocked: false,
             },
         },
         {
