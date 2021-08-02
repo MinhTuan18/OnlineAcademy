@@ -8,6 +8,8 @@ const register = async (req, res) => {
         // console.log(user);
         //const accessToken = await tokenService.generateAuthTokens(user);
         const { otp, hash } = otpService.generateOTP(user.email);
+        console.log(otp);
+        // console.log(hash);
         const result = await nodemailerService.sendOTP(user.email, otp);
         console.log(result);
         res.status(201).json(
@@ -34,7 +36,7 @@ const login = async (req, res) => {
         // console.log(user);
         const accessToken = await tokenService.generateAuthTokens(user);
         // console.log(accessToken);
-        res.status(200).json({ message: 'Successfully Logged In', data:  { user, accessToken: accessToken.token, expiresIn: accessToken.expires } });
+        res.status(200).json({ message: 'Successfully Logged In', data:  { isAuthenticated: true, user, accessToken: accessToken.token, expiresIn: accessToken.expires } });
     } catch (error) {
         res.status(error.statusCode || 500).json(error.message);
     }
@@ -56,12 +58,34 @@ const changePassword = async (req, res) => {
     } catch (error) {
       res.status(error.statusCode || 500).json({message: error.message});
     }
-  };
+};
+
+const activateAccount =  async (req, res) => {
+  const { email, otp, hash } = req.body;
+  try {
+    if (otpService.verifyOTP(otp, hash, email)) {
+      const activatedAccount = await userService.updateActivatedStatus(email);
+      res.status(200).json({ verified: true, message: 'Successfully activated account', userData: activatedAccount});
+    }
+    res.status(400).json({verified: false, expired: false, message: 'OTP is not correct. Try again later'})
+  } catch (error) {
+    res.status(400).json({verified: false, expired: true, message: 'OTP expired. Try again later'})
+  }
+}
+
+const resendOTP = async (req, res) => {
+  const { email } = req.body;
+  const { otp, hash } = otpService.generateOTP(email);
+  // console.log(otp);
+  // console.log(hash);
+  const sendOTPResult = await nodemailerService.sendOTP(email, otp);
+  res.status(200).json({ success: true, message: 'Successfully resent OTP to user email', hash});
+}
   
-
-
 module.exports = {
-    register,
-    login,
-    changePassword,
+  register,
+  login,
+  changePassword,
+  activateAccount,
+  resendOTP,
 }

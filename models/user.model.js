@@ -24,7 +24,7 @@ const UserSchema = new mongoose.Schema(
             minlength: 6,
             validate(value) {
                 if (!value.match(/\d/) || !value.match(/[a-z]/) || !value.match(/[A-Z]/)) {
-                    throw new Error('Password must contain at least one upcase letter and one number');
+                    throw new Error('Password must contain at least one upcase letter, one lowcase letter and one number');
                 }
             },
             // private: true, // used by the toJSON plugin

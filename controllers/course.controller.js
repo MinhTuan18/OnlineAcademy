@@ -40,6 +40,13 @@ const getCourses = async (req, res) => {
             // console.log(options);
             courses = await courseService.queryNewestCourses();
             console.log(courses);
+            break;
+        case '3':
+            // console.log('OK');
+            // options = extract(req.query, ['limit', 'page']);
+            // console.log(options);
+            courses = await courseService.queryBestSellerCourses();
+            console.log(courses);
             break; 
         default:
             // console.log('OK');

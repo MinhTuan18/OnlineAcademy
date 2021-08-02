@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
-const { Course, SubCategory, Category } = require('../models');
+const { registeredCourseService } = require('.');
+const { Course, SubCategory, Category, RegisteredCourse } = require('../models');
+const { registerCourse } = require('./registered-course.service');
 
 /**
  * Query for all courses
@@ -314,11 +316,11 @@ const queryCoursesFilterByCategory = async (filter, options) => {
 **/
 const queryMostViewCourses = async () => {
     const courses = await Course.aggregate([
-        //   {
-        //     $match: {
-        //       isBlocked: false,
-        //     },
-        //   },
+        {
+            $match: {
+                isBlocked: false,
+            },
+        },
         {
             $project: {
                 title: 1,
@@ -388,11 +390,11 @@ const queryNewestCourses = async () => {
     // isBlocked: false - published
   
     const courses = await Course.aggregate([
-        // {
-        //     $match: {
-        //         isBlocked: false,
-        //     },
-        // },
+        {
+            $match: {
+                isBlocked: false,
+            },
+        },
         {
             $project: {
                 title: 1,
@@ -470,27 +472,24 @@ const queryOutstandingCourses = async () => {
                 createdAt: {
                     $gte: start,
                 },
-                status: 2,
+                isBlocked: false,
             },
         },
         {
             $project: {
-                name: 1,
-                introDescription: { $trim: { input: '$introDescription' } },
-                targets: 1,
+                title: 1,
+                subCategory: 1,
+                thumbnailImageUrl: 1,
                 instructor: 1,
                 averageRating: 1,
-                totalTime: 1,
-                totalLecture: 1,
+                numOfRatings: 1,
                 fee: 1,
-                urlThumb: 1,
+                discount: 1,
                 createdAt: 1,
-                totalComment: {
+                totalComments: {
                     $size: '$comments',
                 },
-                totalViewer: {
-                    $size: '$viewers',
-                },
+                totalViews: 1,
             },
         },
         { $sort: 
@@ -524,6 +523,45 @@ const queryOutstandingCourses = async () => {
         { $limit: 4 },
     ]);
     return courses;
+};
+
+/**
+ * Query for best seller courses
+ * @returns {Promise<QueryResult>}
+**/
+const queryBestSellerCourses = async () => {  
+    // isBlocked: false - published
+    const registeredCourses = await RegisteredCourse.aggregate([
+        {
+            $lookup: {
+                from: 'courses',
+                localField: 'course',
+                foreignField: '_id',
+                as: 'course',
+            },
+        },
+        { $unwind: '$course' },
+        {
+            $group: {
+                _id: '$course',
+                count: { $sum: 1},
+            }
+        },
+        { $sort: {count: -1} },
+        { $limit: 10 },
+        { 
+            $addFields: {
+                course: '$_id',
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+            }
+        },
+    ]);
+    
+    return registeredCourses;
 };
 
 /**
@@ -598,6 +636,7 @@ module.exports = {
     queryCoursesAdvancedFilter,
     queryMostViewCourses,
     queryNewestCourses,
+    queryBestSellerCourses,
     getCourseById,
     updateCourseById,
     deleteCourseById,

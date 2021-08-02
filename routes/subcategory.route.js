@@ -4,6 +4,10 @@ const {auth} = require('../middlewares/auth.mdw');
 const router = express.Router();
 
 router
+  .route('/most-registered')
+  .get(subcategoryController.getMostRegisterSubCategoriesLast7Days);
+
+router
   .route('/')
   .get(subcategoryController.getSubCategories)
   .post(auth, subcategoryController.createCategory);
@@ -13,6 +17,8 @@ router
   .get(subcategoryController.getCategoryById)
   .patch(auth, subcategoryController.updateCategory)
   .delete(auth, subcategoryController.deleteCategory);
+
+
 
 // router.get('/:id', subcategoryController.getCategoryById);
 
