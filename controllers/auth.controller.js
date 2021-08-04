@@ -54,7 +54,7 @@ const changePassword = async (req, res) => {
       if (!result) {
         return res.status(500).json('Cannot change password');
       }
-      res.status(200).json('Change password successfully');
+      res.status(200).json({message: 'Change password successfully', success: true});
     } catch (error) {
       res.status(error.statusCode || 500).json({message: error.message});
     }
