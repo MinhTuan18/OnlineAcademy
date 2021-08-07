@@ -24,7 +24,7 @@ const CourseSchema = new mongoose.Schema(
         instructor: {
             type: mongoose.SchemaTypes.ObjectId,
             ref: 'User',
-            required: true,
+            required: [true, 'Course Instructor Is Required'],
         },
         shortDesc: {
             type: String, 

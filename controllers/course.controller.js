@@ -1,6 +1,25 @@
 const { courseService, categoryService} = require('../services');
 const extract = require('../utils/ExtractProperties');
 
+const createCourse = async (req, res) => {
+    // const { user } = req;
+    // const { _id: instructorId } = user;
+    const courseBody = req.body;
+    try {
+        const newCourse = await courseService.createCourse(courseBody);
+        if (!newCourse) {
+            return res.status(204).json({message: 'Cannot create course', error: ''});
+        }
+        return res.status(201).json({
+            message: 'Successfully created a new course',
+            data: newCourse
+        });
+    } catch (error) {
+        return res.status(400).json(error.message);
+    }
+   
+}
+
 const getCourse = async (req, res) => {
     const courseId = req.params.id;
     const course = await courseService.getCourseById(courseId);
@@ -68,22 +87,6 @@ const getCourses = async (req, res) => {
         return res.status(204);
     }
     return res.status(200).json(courses);
-}
-
-const createCourse = async (req, res) => {
-    // const { user } = req;
-    // const { _id: instructorId } = user;
-    const courseBody = req.body;
-    try {
-        const newCourse = await courseService.createCourse(courseBody);
-        if (!newCourse) {
-            return res.status(204).json({message: 'Cannot create course', error: ''});
-        }
-        return res.status(201).json('Successfully created a new course');
-    } catch (error) {
-        return res.status(400).json(error.message);
-    }
-   
 }
 
 const updateCourse = async (req, res) => {

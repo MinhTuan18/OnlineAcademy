@@ -1,7 +1,31 @@
 const mongoose = require('mongoose');
-const { registeredCourseService } = require('.');
 const { Course, SubCategory, Category, RegisteredCourse } = require('../models');
-const { registerCourse } = require('./registered-course.service');
+
+/**
+ * Create a course
+ * @param {Object} courseInfo
+ * @returns {Promise<Course>}
+**/
+const createCourse = async (courseInfo) => {
+    const { subCategory } = courseInfo;
+    const course = await Course.create(courseInfo);
+    // console.log(course);
+    const { id: courseId } = course; 
+    const options = {
+        new: true,
+        omitUndefined: true
+    }
+    await SubCategory.findByIdAndUpdate(
+        mongoose.Types.ObjectId(subCategory),
+        { $push: 
+            { 
+                courses: courseId,
+            } 
+        }, 
+        options
+    );
+    return course;
+};
 
 /**
  * Query for all courses
@@ -101,7 +125,7 @@ const queryCoursesFilterByCategory = async (filter, options) => {
     const { sort, limit, skip } = options;
 
     // query course ids belong to categeory
-    const queryCoursesInCategory = [
+    const querySubcatCoursesInCategory = [
         { $match: { _id: id } },
         {
             $lookup: {
@@ -120,8 +144,10 @@ const queryCoursesFilterByCategory = async (filter, options) => {
         },
     ];
   
-    const queryCoursesInCategoryResults = await Category.aggregate(queryCoursesInCategory);
-    const { subCatCourseIds } = queryCoursesInCategoryResults[0];
+    const querySubcatsCoursesInCategoryResults = await Category.aggregate(querySubcatCoursesInCategory);
+    console.log(querySubcatsCoursesInCategoryResults);
+    const { subCatCourseIds } = querySubcatsCoursesInCategoryResults[0];
+    console.log(subCatCourseIds);
     let courseIds = [];
     subCatCourseIds.forEach(subCatCourseId => {
       courseIds = [...courseIds, ...subCatCourseId];
@@ -268,6 +294,7 @@ const queryCoursesFilterByCategory = async (filter, options) => {
  * @returns {Promise<QueryResult>}
 **/
  const queryCoursesAdvancedFilter = async (filter, options) => {
+    // console.log(filter);
     const categoryId = filter.category === undefined ? undefined : new mongoose.Types.ObjectId(filter.category);
     const subCategoryId = filter.subCategory === undefined ? undefined : new mongoose.Types.ObjectId(filter.subCategory);
     const limit = options.limit ? options.limit : 10;
@@ -571,15 +598,6 @@ const queryBestSellerCourses = async () => {
 **/
 const getCourseById = async (courseId) => {
     return Course.findById(mongoose.Types.ObjectId(courseId));
-};
-
-/**
- * Create a course
- * @param {Object} courseInfo
- * @returns {Promise<Course>}
-**/
-const createCourse = async (courseInfo) => {
-    return await Course.create(courseInfo);
 };
 
 /**

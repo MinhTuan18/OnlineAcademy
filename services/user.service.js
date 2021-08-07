@@ -56,23 +56,15 @@ const updateUserProfile = async (id, userInfo) => {
 	return result.toObject();
 };
 
-const activatedAccount = async (email, otp, hash) => {
-    if (!email || !otp || !hash) {
-        throw new ApiError('', httpStatus.BAD_REQUEST);
-    }
+const updateActivatedStatus = async (email) => {
     const user = await getUserByEmail(email);
     if (!user) {
-        throw new ApiError('Email not exist!', httpStatus.BAD_REQUEST);
+        throw new ApiError('User email not exist!', httpStatus.BAD_REQUEST);
     }
     if (user.isActivated) {
-        throw new ApiError('You have been activated', httpStatus.BAD_REQUEST);
+        throw new ApiError('This account have been activated', httpStatus.BAD_REQUEST);
     }
-    const optVerify = otpService.verifyOtp(otp, hash, user.email);
-    if (!optVerify) {
-        throw new ApiError('OTP Incorrect', httpStatus.BAD_REQUEST);
-    }
-    const result = await User.findByIdAndUpdate({_id: user.id}, { isActivated: true }, { new: true });
-    return result;
+    return await User.findByIdAndUpdate({_id: user.id}, { isActivated: true }, { new: true });
 };
 
 const changePassword = async (user, oldPassword, newPassword) => {
@@ -87,6 +79,6 @@ module.exports = {
     createUser,
     getUserByEmail,
     updateUserProfile,
-    activatedAccount,
+    updateActivatedStatus,
     changePassword
 }

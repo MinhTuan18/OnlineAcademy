@@ -98,7 +98,7 @@ const sendOtp =  (req, res) => {
 }
 */
 
-const verifyOtp = (otp, hash, email) => {
+const verifyOTP = (otp, hash, email) => {
     let [dataHash, expiresAt] = hash.split('.')
 
     let now = Date.now()
@@ -115,6 +115,6 @@ const verifyOtp = (otp, hash, email) => {
 }
 
 module.exports = {
-    verifyOtp, 
+    verifyOTP, 
     generateOTP,
 } 
