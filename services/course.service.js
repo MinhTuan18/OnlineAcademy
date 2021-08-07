@@ -1,3 +1,4 @@
+const { searchconsole } = require('googleapis/build/src/apis/searchconsole');
 const mongoose = require('mongoose');
 const { registeredCourseService } = require('.');
 const { Course, SubCategory, Category, RegisteredCourse } = require('../models');
@@ -38,6 +39,7 @@ const queryCourses = async (filter, options) => {
                 thumbnailImageUrl: 1,
                 instructor: 1,
                 averageRating: 1,
+                numOfRatings: 1,
                 fee: 1,
                 discount: 1,
             },
@@ -270,7 +272,7 @@ const queryCoursesFilterByCategory = async (filter, options) => {
  const queryCoursesAdvancedFilter = async (filter, options) => {
     const categoryId = filter.category === undefined ? undefined : new mongoose.Types.ObjectId(filter.category);
     const subCategoryId = filter.subCategory === undefined ? undefined : new mongoose.Types.ObjectId(filter.subCategory);
-    const limit = options.limit ? options.limit : 10;
+    const limit = options.limit ? parseInt(options.limit) : 10;
     const page = options.page ? options.page : 1;
     const skip = (page - 1) * limit;
   
@@ -296,7 +298,7 @@ const queryCoursesFilterByCategory = async (filter, options) => {
             { id: categoryId, title: filter.title || '' }, 
             { limit, skip, sort }
         );
-    } else {
+    }  else {
         result = await queryCoursesFilterByTitle({ title: filter.title || '' }, { limit, skip, sort });
     }
   
@@ -605,6 +607,174 @@ const deleteCourseById = async (courseId) => {
     return await Course.findByIdAndDelete(mongoose.Types.ObjectId(courseId));
 };
 
+const getCourseList = async (filter, options) => {
+    const categoryId = filter.category === undefined ? undefined : new mongoose.Types.ObjectId(filter.category);
+    const subCategoryId = filter.subCategory === undefined ? undefined : new mongoose.Types.ObjectId(filter.subCategory);
+    const limit = options.limit ? parseInt(options.limit) : 10;
+    const page = options.page ? options.page : 1;
+    const skip = (page - 1) * limit;
+  
+    const sort = {};
+    if (options.sortBy) {
+        options.sortBy.split(',').forEach((sortOption) => {
+            const [key, sortOrder] = sortOption.split(':');
+            sort[key] = sortOrder === 'desc' ? -1 : 1;
+        });
+    } else {
+        sort.createdAt = 1;
+    }
+  
+    let result;
+  
+    if (categoryId === undefined && subCategoryId !== undefined) {
+        result = await getCourseBySubCategoryId(
+            { id: subCategoryId, title: filter.title || '' },
+            { limit, skip, sort }
+        );
+    } else if (categoryId !== undefined && subCategoryId === undefined) {
+       
+        result = await getCourseByCategoryId({ id: categoryId, title: filter.title || '' }, { limit, skip, sort });
+    }  else {
+        result = await getAllCourses({ title: filter.title || '' }, { limit, skip, sort });
+    }
+  
+    const { courses, totalResults } = result;
+
+    const totalPages = Math.ceil(totalResults / limit);
+  
+    return { courses, totalResults, totalPages, limit };
+}
+
+const getCourseByCategoryId = async (filter, options) => {
+    const { id, title } = filter;
+    const { sort, limit, skip } = options;
+    const subCats = await SubCategory.find({ category: id});
+    if (!subCats) return {courses: [], totalResults: 0};
+
+    const query = Course.find({subCategory: {$in : subCats}})
+                        .select('thumbnailImageUrl fee title subCategory instructor averageRating numberOfRating')
+                        .populate([
+                            {
+                                path: 'subCategory',
+                                select: 'name',
+                            },
+                            {
+                                path: 'instructor',
+                                select: 'name',
+                            }
+                        ])
+
+    if (title.length > 0) {
+        query.find({ $text: { $search: title } });
+    }
+
+    const totalResults = await Course.countDocuments(query);
+
+
+    let courses = await query.sort(sort)
+                                .limit(limit)
+                                .skip(skip)
+                                .lean();
+                               
+    
+    if (courses) {
+        courses = courses.map((course) => {
+            course.instructorName = course.instructor.name;
+            delete course.instructor;
+
+            course.subCategory = course.subCategory.name;
+            return course;
+        });
+    }
+
+    return { courses, totalResults };
+}
+
+const getCourseBySubCategoryId = async (filter, options) => {
+    const { id, title } = filter;
+    const { sort, limit, skip } = options;
+
+    const query = Course.find({subCategory: id})
+                        .select('thumbnailImageUrl fee title subCategory instructor averageRating numberOfRating')
+                        .populate([
+                            {
+                                path: 'subCategory',
+                                select: 'name',
+                            },
+                            {
+                                path: 'instructor',
+                                select: 'name',
+                            }
+                        ])
+                        
+    if (title.length > 0) {
+        query.find({ $text: { $search: title } });
+    }
+
+    const totalResults = await Course.countDocuments(query);
+
+
+    let courses = await query.sort(sort)
+                                .limit(limit)
+                                .skip(skip)
+                                .lean();
+                               
+    
+    if (courses) {
+        courses = courses.map((course) => {
+            course.instructorName = course.instructor.name;
+            delete course.instructor;
+
+            course.subCategory = course.subCategory.name;
+            return course;
+        });
+    }
+
+    return { courses, totalResults };
+}
+
+const getAllCourses = async (filter, options) => {
+    const { title } = filter;
+    const { sort, limit, skip } = options;
+
+    const query = Course.find()
+                        .select('thumbnailImageUrl fee title subCategory instructor averageRating numberOfRating')
+                        .populate([
+                            {
+                                path: 'subCategory',
+                                select: 'name',
+                            },
+                            {
+                                path: 'instructor',
+                                select: 'name',
+                            }
+                        ])
+                        
+    if (title.length > 0) {
+        query.find({ $text: { $search: title } });
+    }
+
+    const totalResults = await Course.countDocuments(query);
+
+
+    let courses = await query.sort(sort)
+                                .limit(limit)
+                                .skip(skip)
+                                .lean();
+                               
+    
+    if (courses) {
+        courses = courses.map((course) => {
+            course.instructorName = course.instructor.name;
+            delete course.instructor;
+
+            course.subCategory = course.subCategory.name;
+            return course;
+        });
+    }
+
+    return { courses, totalResults };
+}
 // /**
 //  * Query for courses of one category
 //  * @param {Object} filter - Mongo filter
@@ -640,4 +810,5 @@ module.exports = {
     getCourseById,
     updateCourseById,
     deleteCourseById,
+    getCourseList,
 };

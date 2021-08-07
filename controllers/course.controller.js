@@ -107,6 +107,15 @@ const deleteCourse = async (req, res) => {
         data: isCourseDeleted
     })
 }
+const getCourseList = async (req, res) => {
+    filter = extract(req.query, ['title', 'category', 'subCategory']);
+    options = extract(req.query, ['sortBy', 'limit', 'page']);
+    courses = await courseService.getCourseList(filter, options);
+    if (!courses || courses.length === 0) {
+        return res.status(204);
+    }
+    return res.status(200).json(courses);
+}
 
 module.exports = {
     getCourse,
@@ -114,4 +123,5 @@ module.exports = {
     createCourse,
     updateCourse,
     deleteCourse,
+    getCourseList,
 }
