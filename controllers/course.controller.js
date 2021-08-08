@@ -30,20 +30,7 @@ const getCourse = async (req, res) => {
 }
 
 const getCourses = async (req, res) => {
-    // const categoryId  = req.query.catId || '';
-    // //console.log(categoryId);
-    // const courseTitle = req.query.title || '';
-    // //console.log(courseTitle);
-    // const sortBy = req.query.sortBy || '';
-    // // const limit = req.query.limit || '';
-    // // const page = req.query.page || '';
     const { type } = req.query;
-    // console.log(type);
-    // let filter = {};
-    // let options = {
-    //     limit: req.query.limit || 10,
-    //     page: req.query.page || 1
-    // }
     let filter, options, courses;
     switch (type) {
         case '1':
@@ -76,13 +63,6 @@ const getCourses = async (req, res) => {
             break;
             
     }
-    // if (categoryId !== '') filter.category = categoryId;
-    // if (courseTitle !== '') filter.$text = { $search: courseTitle };
-    // //console.log(filter);
-    // if (sortBy !== '') options.sort = {sortBy: 1};
-    
-    // const courses = await courseService.queryCourses(filter, options);
-    // //console.log(courses);
     if (!courses || courses.length === 0) {
         return res.status(204);
     }

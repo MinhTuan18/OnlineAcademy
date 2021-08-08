@@ -145,7 +145,7 @@ const queryCoursesFilterByCategory = async (filter, options) => {
     ];
   
     const querySubcatsCoursesInCategoryResults = await Category.aggregate(querySubcatCoursesInCategory);
-    console.log(querySubcatsCoursesInCategoryResults);
+    // console.log(querySubcatsCoursesInCategoryResults);
     const { subCatCourseIds } = querySubcatsCoursesInCategoryResults[0];
     console.log(subCatCourseIds);
     let courseIds = [];
@@ -169,7 +169,7 @@ const queryCoursesFilterByCategory = async (filter, options) => {
         },
         {
             $lookup: {
-                from: 'user',
+                from: 'users',
                 localField: 'instructor',
                 foreignField: '_id',
                 as: 'instructor',
@@ -193,7 +193,6 @@ const queryCoursesFilterByCategory = async (filter, options) => {
         { $limit: limit },
     ];
   
-    // status: 2 - published
     const queryTotalResults = {
         _id: { $in: courseIds },
     };
@@ -206,8 +205,9 @@ const queryCoursesFilterByCategory = async (filter, options) => {
         queryTotalResults.$text = { $search: title };
     }
   
-    const totalResults = await Course.find(queryTotalResults).countDocuments();
     const courses = await Course.aggregate(queryFilter);  
+    console.log(courses);
+    const totalResults = await Course.find(queryTotalResults).countDocuments();
     return { courses, totalResults };
 };
 
@@ -242,7 +242,7 @@ const queryCoursesFilterByCategory = async (filter, options) => {
         },
         {
             $lookup: {
-                from: 'user',
+                from: 'users',
                 localField: 'instructor',
                 foreignField: '_id',
                 as: 'instructor',
@@ -297,6 +297,8 @@ const queryCoursesFilterByCategory = async (filter, options) => {
     // console.log(filter);
     const categoryId = filter.category === undefined ? undefined : new mongoose.Types.ObjectId(filter.category);
     const subCategoryId = filter.subCategory === undefined ? undefined : new mongoose.Types.ObjectId(filter.subCategory);
+    const title = filter.title === undefined ? undefined : filter.title;
+
     const limit = options.limit ? options.limit : 10;
     const page = options.page ? options.page : 1;
     const skip = (page - 1) * limit;
@@ -323,8 +325,15 @@ const queryCoursesFilterByCategory = async (filter, options) => {
             { id: categoryId, title: filter.title || '' }, 
             { limit, skip, sort }
         );
-    } else {
+    } else if (title) {
         result = await queryCoursesFilterByTitle({ title: filter.title || '' }, { limit, skip, sort });
+    }
+    else {
+        // console.log('OK');
+        result = await queryCourses({}, { limit, skip, sort });
+        console.log(result);
+        const { docs: courses, totalDocs: totalResults, totalPages } = result;    
+        return { courses, totalResults, totalPages, limit };
     }
   
     const { courses, totalResults } = result;
@@ -332,8 +341,6 @@ const queryCoursesFilterByCategory = async (filter, options) => {
   
     return { courses, totalResults, totalPages, limit };
 };
-
-
 
 /**
  * Query for most-view courses
