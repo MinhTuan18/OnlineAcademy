@@ -40,6 +40,10 @@ const CourseSchema = new mongoose.Schema(
             max: 5, 
             default: 0.0,
         },
+        totalRatings: {
+            type: Number, 
+            default: 0,
+        },
         comments: {
             type: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Feedback' }],
             default: [],
@@ -80,6 +84,7 @@ const CourseSchema = new mongoose.Schema(
             type: Number,
             default: 0,
         },
+        
     },
     {
         timestamps: true,
