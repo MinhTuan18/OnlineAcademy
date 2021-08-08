@@ -75,30 +75,30 @@ const updateCategoryById = async (catId, updateBody) => {
         new: true,
         omitUndefined: true
     }
-    return await Category.findByIdAndUpdate(mongoose.Types.ObjectId(catId),{ name: updateBody }, options);
+    return await Category.findByIdAndUpdate(mongoose.Types.ObjectId(catId), updateBody, options);
 };
 
-/**
- * Update subcategory into category by id
- * @param {ObjectId} catId
- * @param {Object} subCatId
- * @returns {Promise<Category>}
-**/
-const updateSubCatIntoCategoryById = async (catId, subCatId) => {
-    const options = {
-        new: true,
-        omitUndefined: true
-    }
-    return await Category.findByIdAndUpdate(
-        mongoose.Types.ObjectId(catId),
-        { $push: 
-            { 
-                subCategories: subCatId,
-            } 
-        }, 
-        options
-    );
-};
+// /**
+//  * Update subcategory into category by id
+//  * @param {ObjectId} catId
+//  * @param {Object} subCatId
+//  * @returns {Promise<Category>}
+// **/
+// const updateSubCatIntoCategoryById = async (catId, subCatId) => {
+//     const options = {
+//         new: true,
+//         omitUndefined: true
+//     }
+//     return await Category.findByIdAndUpdate(
+//         mongoose.Types.ObjectId(catId),
+//         { $push: 
+//             { 
+//                 subCategories: subCatId,
+//             } 
+//         }, 
+//         options
+//     );
+// };
 
 /**
  * Delete category by id
@@ -119,6 +119,6 @@ module.exports = {
     getCategories,
     queryAllCategories,
     updateCategoryById, 
-    updateSubCatIntoCategoryById,
+    // updateSubCatIntoCategoryById,
     deleteCategoryById,
 }
