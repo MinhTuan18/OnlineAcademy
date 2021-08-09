@@ -1,19 +1,19 @@
 const { subcategoryService } = require('../services');
 
-const createCategory = async (req, res) => {
-  const categoryBody  = req.body;
+const createSubCategory = async (req, res) => {
+  const subCategoryBody  = req.body;
   // // console.log(name);
   // if (!name){
   //   return res.status(400).json("Category name is required!");
   // }
   try {
-    const category = await subcategoryService.createCategory(categoryBody);
-    if (!category && !category.id){
+    const subCategory = await subcategoryService.createSubCategory(subCategoryBody);
+    if (!subCategory && !subCategory.id){
       return res.status(500).json("Please try again later");
     }
     res.status(201).json({
-      message: "Create category successfully!",
-      data: category,
+      message: "Create sub-category successfully!",
+      data: subCategory,
     });
   } catch (error) {
     res.status(400).json(error.message);
@@ -27,7 +27,7 @@ const getMostRegisterSubCategoriesLast7Days = async (req, res) => {
 }
 
 module.exports = {
-  createCategory,
+  createSubCategory,
   getMostRegisterSubCategoriesLast7Days,
   getAllCategory: async function (req, res) {
     const listCategory = await subcategoryService.getCategories();
