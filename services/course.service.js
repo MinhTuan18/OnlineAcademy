@@ -2,6 +2,7 @@ const { searchconsole } = require('googleapis/build/src/apis/searchconsole');
 const mongoose = require('mongoose');
 const { registeredCourseService } = require('.');
 const { Course, SubCategory, Category, RegisteredCourse } = require('../models');
+const Feedback = require('../models/feedback.model');
 const { registerCourse } = require('./registered-course.service');
 
 /**
@@ -652,7 +653,7 @@ const getCourseByCategoryId = async (filter, options) => {
     if (!subCats) return {courses: [], totalResults: 0};
 
     const query = Course.find({subCategory: {$in : subCats}})
-                        .select('thumbnailImageUrl fee title subCategory instructor averageRating numberOfRating')
+                        .select('thumbnailImageUrl fee title subCategory instructor averageRating ')
                         .populate([
                             {
                                 path: 'subCategory',
@@ -678,13 +679,17 @@ const getCourseByCategoryId = async (filter, options) => {
                                
     
     if (courses) {
-        courses = courses.map((course) => {
+        courses = await Promise.all(courses.map(async (course) => {
             course.instructorName = course.instructor.name;
             delete course.instructor;
 
-            course.subCategory = course.subCategory.name;
+            course.category= course.subCategory.name;
+            delete course.subCategory;
+
+            const totalRatings = await Feedback.find({ courseId: course._id}).countDocuments();
+            course.totalRatings = totalRatings;
             return course;
-        });
+        }));
     }
 
     return { courses, totalResults };
@@ -695,7 +700,7 @@ const getCourseBySubCategoryId = async (filter, options) => {
     const { sort, limit, skip } = options;
 
     const query = Course.find({subCategory: id})
-                        .select('thumbnailImageUrl fee title subCategory instructor averageRating numberOfRating')
+                        .select('thumbnailImageUrl fee title subCategory instructor averageRating')
                         .populate([
                             {
                                 path: 'subCategory',
@@ -721,13 +726,17 @@ const getCourseBySubCategoryId = async (filter, options) => {
                                
     
     if (courses) {
-        courses = courses.map((course) => {
+        courses = await Promise.all(courses.map(async (course) => {
             course.instructorName = course.instructor.name;
             delete course.instructor;
 
-            course.subCategory = course.subCategory.name;
+            course.category= course.subCategory.name;
+            delete course.subCategory;
+
+            const totalRatings = await Feedback.find({ courseId: course._id}).countDocuments();
+            course.totalRatings = totalRatings;
             return course;
-        });
+        }));
     }
 
     return { courses, totalResults };
@@ -738,7 +747,7 @@ const getAllCourses = async (filter, options) => {
     const { sort, limit, skip } = options;
 
     const query = Course.find()
-                        .select('thumbnailImageUrl fee title subCategory instructor averageRating numberOfRating')
+                        .select('thumbnailImageUrl fee title subCategory instructor averageRating ')
                         .populate([
                             {
                                 path: 'subCategory',
@@ -764,13 +773,17 @@ const getAllCourses = async (filter, options) => {
                                
     
     if (courses) {
-        courses = courses.map((course) => {
+        courses = await Promise.all(courses.map(async (course) => {
             course.instructorName = course.instructor.name;
             delete course.instructor;
 
-            course.subCategory = course.subCategory.name;
+            course.category= course.subCategory.name;
+            delete course.subCategory;
+
+            const totalRatings = await Feedback.find({ courseId: course._id}).countDocuments();
+            course.totalRatings = totalRatings;
             return course;
-        });
+        }));
     }
 
     return { courses, totalResults };

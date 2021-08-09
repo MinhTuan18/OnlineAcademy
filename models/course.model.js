@@ -40,11 +40,6 @@ const CourseSchema = new mongoose.Schema(
             max: 5, 
             default: 0.0,
         },
-        numberOfRating: {
-            type: Number, 
-            min: 0, 
-            default: 0,
-        },
         comments: {
             type: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Feedback' }],
             default: [],
