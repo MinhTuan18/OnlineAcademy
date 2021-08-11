@@ -10,7 +10,7 @@ router
 router
   .route('/')
   .get(subcategoryController.getSubCategories)
-  .post(auth, subcategoryController.createCategory);
+  .post(auth, subcategoryController.createSubCategory);
 
 router
   .route('/:id')
