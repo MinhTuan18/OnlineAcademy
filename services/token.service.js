@@ -13,13 +13,13 @@ const httpStatus = require('http-status');
  * @param {string} [secret]
  * @returns {string}
 **/
-const generateToken = (userId, expires, type) => {
+const generateToken = (userId, type) => {
     // console.log(expires);
 
     const payload = {
         sub: userId,
-        iat: moment().unix(),
-        exp: expires.unix(),
+        // iat: moment().unix(),
+        // exp: expires.unix(),
         type,
     };
     // console.log(payload);
@@ -33,15 +33,15 @@ const generateToken = (userId, expires, type) => {
 **/
 const generateAuthTokens = (user) => {
     //console.log(user._id);
-    const accessTokenExpires = moment().add(envConfigs.jwt.accessExpirationMinutes, 'minutes');
+    // const accessTokenExpires = moment().add(envConfigs.jwt.accessExpirationMinutes, 'minutes');
     // console.log(accessTokenExpires);
 
-    const accessToken = generateToken(user._id, accessTokenExpires, 'access');
+    const accessToken = generateToken(user._id, 'access');
     // console.log(accessToken);
     
     return {
         token: accessToken,
-        expires: accessTokenExpires.toString()
+        // expires: accessTokenExpires.toString()
     };
 };
 

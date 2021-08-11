@@ -74,6 +74,9 @@ const createCourse = async (req, res) => {
     // const { user } = req;
     // const { _id: instructorId } = user;
     const courseBody = req.body;
+    const instructor = req.instructorId;
+    courseBody.instructor = instructor;
+    console.log(instructor);
     try {
         const newCourse = await courseService.createCourse(courseBody);
         if (!newCourse) {

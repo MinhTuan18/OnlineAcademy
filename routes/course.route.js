@@ -1,13 +1,13 @@
 const express = require('express');
 const { courseController } = require('../controllers');
-const { auth } = require('../middlewares/auth.mdw');
+const { auth, instructorAuth } = require('../middlewares/auth.mdw');
 const router = express.Router();
 
 
 router
   .route('/')
   .get(courseController.getCourses)
-  .post(auth, courseController.createCourse);
+  .post(instructorAuth, courseController.createCourse);
 
 router
   .route('/:id')
