@@ -22,11 +22,46 @@ const getCategoryById = async (catId) => {
 };
 
 /**
- * Get a categories
+ * Get all categories
  * @returns {Promise<Category>}
 **/
 const getCategories = async () => {
     return await Category.paginate();
+};
+
+/**
+ * Query for categories
+ * @returns {Promise<QueryResult>}
+**/
+const queryAllCategories = async () => {
+    const categories = await Category.aggregate([
+        
+        {
+            $lookup: {
+                from: 'subcategories',
+                localField: 'subCategories',
+                foreignField: '_id',
+                as: 'subCategories',
+            },
+        },
+        {
+            $addFields: {
+                'subCategories.total': { $size: '$subCategories.courses' },
+            },
+        },
+        {
+            $project: {
+                'subCategories.category': 0,
+            },
+        },
+        {
+            $addFields: {
+                total: { $sum: '$subCategories.total' },
+            },
+        },
+    ]);
+  
+    return categories;
 };
 
 /**
@@ -40,8 +75,30 @@ const updateCategoryById = async (catId, updateBody) => {
         new: true,
         omitUndefined: true
     }
-    return await Category.findByIdAndUpdate(mongoose.Types.ObjectId(catId),{ name: updateBody }, options);
+    return await Category.findByIdAndUpdate(mongoose.Types.ObjectId(catId), updateBody, options);
 };
+
+// /**
+//  * Update subcategory into category by id
+//  * @param {ObjectId} catId
+//  * @param {Object} subCatId
+//  * @returns {Promise<Category>}
+// **/
+// const updateSubCatIntoCategoryById = async (catId, subCatId) => {
+//     const options = {
+//         new: true,
+//         omitUndefined: true
+//     }
+//     return await Category.findByIdAndUpdate(
+//         mongoose.Types.ObjectId(catId),
+//         { $push: 
+//             { 
+//                 subCategories: subCatId,
+//             } 
+//         }, 
+//         options
+//     );
+// };
 
 /**
  * Delete category by id
@@ -60,6 +117,8 @@ module.exports = {
     createCategory,
     getCategoryById,
     getCategories,
+    queryAllCategories,
     updateCategoryById, 
+    // updateSubCatIntoCategoryById,
     deleteCategoryById,
 }

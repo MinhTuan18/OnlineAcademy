@@ -1,18 +1,24 @@
 const express = require('express');
 const { subcategoryController } = require('../controllers');
-const auth = require('../middlewares/auth.mdw');
+const {auth} = require('../middlewares/auth.mdw');
 const router = express.Router();
+
+router
+  .route('/most-registered')
+  .get(subcategoryController.getMostRegisterSubCategoriesLast7Days);
 
 router
   .route('/')
   .get(subcategoryController.getSubCategories)
-  .post(auth, subcategoryController.createCategory);
+  .post(auth, subcategoryController.createSubCategory);
 
 router
   .route('/:id')
   .get(subcategoryController.getCategoryById)
   .patch(auth, subcategoryController.updateCategory)
   .delete(auth, subcategoryController.deleteCategory);
+
+
 
 // router.get('/:id', subcategoryController.getCategoryById);
 

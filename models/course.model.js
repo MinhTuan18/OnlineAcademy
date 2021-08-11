@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
+const aggregatePaginate = require('mongoose-aggregate-paginate-v2');
 
 // const Category = require('./category.model');
 
@@ -10,10 +11,10 @@ const CourseSchema = new mongoose.Schema(
             required: [true, 'Course Title Is Required'],
             index: true,
         },
-        category: {
+        subCategory: {
             type: mongoose.SchemaTypes.ObjectId,
             ref: 'SubCategory',
-            required: [true, 'Course Category Is Required'],
+            required: [true, 'Course Sub-Category Is Required'],
         },
         thumbnailImageUrl: {
             type: String, 
@@ -23,7 +24,7 @@ const CourseSchema = new mongoose.Schema(
         instructor: {
             type: mongoose.SchemaTypes.ObjectId,
             ref: 'User',
-            required: true,
+            required: [true, 'Course Instructor Is Required'],
         },
         shortDesc: {
             type: String, 
@@ -38,6 +39,10 @@ const CourseSchema = new mongoose.Schema(
             min: 0, 
             max: 5, 
             default: 0.0,
+        },
+        totalRatings: {
+            type: Number, 
+            default: 0,
         },
         comments: {
             type: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Feedback' }],
@@ -70,7 +75,16 @@ const CourseSchema = new mongoose.Schema(
             type: String, 
             trim: true,
             default: 'Ongoing',
-        } 
+        }, 
+        isBlocked: {
+            type: Boolean,
+            default: false,      
+        },
+        totalViews: {
+            type: Number,
+            default: 0,
+        },
+        
     },
     {
         timestamps: true,
@@ -81,29 +95,10 @@ const CourseSchema = new mongoose.Schema(
 // text search
 CourseSchema.index({ title: 'text' });
 
-// CourseSchema.statics.getCourseByCategoryID = function (id) {
-//   return this.find({ categoryID: id })
-//   .then((value) => {
-//     return value;
-//   })
-//   .catch((err) => {
-//     throw err;
-//   });
-// }
-
-// CourseSchema.statics.searchCourseByTitle = function (query) {
-//   return this.find({ $text: { $search: query } })
-//     .then((value) => {
-//       return value;
-//     })
-//     .catch((err) => {
-//       throw err;
-//     });
-// }
-
 CourseSchema.set('toObject', { getters: true });
 CourseSchema.set('toJSON', { getters: true });
 CourseSchema.plugin(mongoosePaginate);
+CourseSchema.plugin(aggregatePaginate);
 
 const Course = mongoose.model('Course', CourseSchema);
 

@@ -5,6 +5,7 @@ const createFeedback = async (req, res) => {
   const { userId, courseId, rating, ratingContent } = req.body;
   try {
     const newFeedback = await feedbackService.createFeedBack(userId, courseId, rating, ratingContent);
+    feedbackService.updateCourseRating(updatedFeedback.courseId);
     return res.status(httpStatus.CREATED).json(newFeedback);
   } catch (error) {
     return res.status(error.statusCode || 500).json(error.message);
@@ -40,6 +41,10 @@ const updateFeedback = async (req, res) => {
     if (!updatedFeedback) {
         return res.status(httpStatus.NO_CONTENT).json('Feedback not found');
     }
+    //If update rating, update course average rating
+    if (req.body.rating) {
+      feedbackService.updateCourseRating(updatedFeedback.courseId);
+    }
     res.status(httpStatus.OK).json({
         message: 'Sucessfully updated feedback',
         data: updatedFeedback
@@ -65,10 +70,12 @@ const getFeedbackById = async (req, res) => {
 const deleteFeedback = async (req, res) => {
   const id = req.params.id;
   try {
-    const result = await feedbackService.deleteFeedBack(id);
-    if(!result) {
+    const feedback = await feedbackService.deleteFeedBack(id);
+    if(!feedback) {
       return res.status(httpStatus.NO_CONTENT).json('Feedback not found');
     }
+    //Delete success, calculate course rating and return result;
+    feedbackService.updateCourseRating(feedback.courseId);
     res.status(httpStatus.OK).json('Delelte feedback successfully');
   } catch(error) {
     return res.status(error.statusCode || 500).json(error.message);

@@ -6,10 +6,9 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
-const { userRoute, authRoute, adminRoute, subcategoryRoute, 
-  courseRoute, categoryRoute, feedbackRoute,
-  chapterRoute, watchListRoute } = require('./routes');
 
+const cors = require('cors');
+const { userRoute, authRoute, adminRoute, subcategoryRoute, courseRoute, categoryRoute, feedbackRoute, registeredCourseRoute } = require('./routes');
 
 const app = express();
 dotenv.config();
@@ -17,6 +16,10 @@ dotenv.config();
 app.use(express.json());
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}));
+
+// enable cors
+app.use(cors());
+app.options('*', cors());
 
 //MongoDB Configuration
 mongoose
@@ -46,6 +49,7 @@ app.use('/api/admin', adminRoute);
 app.use('/api/feedback', feedbackRoute);
 app.use('/api/chapter', chapterRoute);
 app.use('/api/watchlist', watchListRoute);
+app.use('/api/registered-course', registeredCourseRoute);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

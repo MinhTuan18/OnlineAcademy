@@ -1,28 +1,34 @@
 const { subcategoryService } = require('../services');
 
-const createCategory = async (req, res) => {
-  const categoryBody  = req.body;
+const createSubCategory = async (req, res) => {
+  const subCategoryBody  = req.body;
   // // console.log(name);
   // if (!name){
   //   return res.status(400).json("Category name is required!");
   // }
   try {
-    const category = await subcategoryService.createCategory(categoryBody);
-    if (!category && !category.id){
+    const subCategory = await subcategoryService.createSubCategory(subCategoryBody);
+    if (!subCategory && !subCategory.id){
       return res.status(500).json("Please try again later");
     }
     res.status(201).json({
-      message: "Create category successfully!",
-      data: category,
+      message: "Create sub-category successfully!",
+      data: subCategory,
     });
   } catch (error) {
     res.status(400).json(error.message);
   }
 }
 
-module.exports = {
-  createCategory,
+const getMostRegisterSubCategoriesLast7Days = async (req, res) => {
+  // console.log('OK');
+  const registeredCourses = await subcategoryService.queryMostRegisteredSubCategoryLast7Days();
+  res.status(200).json(registeredCourses);
+}
 
+module.exports = {
+  createSubCategory,
+  getMostRegisterSubCategoriesLast7Days,
   getAllCategory: async function (req, res) {
     const listCategory = await subcategoryService.getCategories();
     return res.status(200).json(listCategory);
@@ -98,6 +104,6 @@ module.exports = {
         return res.status(404).json({ message: 'Course Not Found'});
     }
     return res.status(200).json(subCategories);
-}
+  }
 
 }

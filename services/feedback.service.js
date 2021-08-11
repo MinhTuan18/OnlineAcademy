@@ -42,10 +42,35 @@ const getFeedbackById = async (id) => {
 const deleteFeedBack = async (feedbackId) => {
   return await Feedback.findByIdAndDelete(feedbackId);
 }
+
+const getAverageRatingOfCourse = courseId => {
+  const feedbacks = Feedback.find({ courseId: courseId});
+  if (!feedbacks) {
+    throw new ApiError('Course is not exist', httpStatus.BAD_REQUEST);
+  }
+  const n_Rating = feedbacks.length;
+  const sum_Rating =  feedbacks.reduce((rating, feedback) => {
+    return rating += feedback.rating;
+  }, 0);
+
+  const average_rating = sum_Rating / n_Rating;
+  return average_rating;
+}
+
+const updateCourseRating = async (courseId) => {
+  const averageRating = getAverageRatingOfCourse(courseId);
+  const course = await Course.findByIdAndUpdate({ _id: courseId }, { averageRating: averageRating }, { new: true });
+  if (!course) {
+    throw new ApiError('Course is not exist', httpStatus.BAD_REQUEST);
+  }
+  return course;
+}
+
 module.exports = {
   createFeedBack,
   updateFeedBack,
   deleteFeedBack,
   queryFeedBack,
   getFeedbackById,
+  updateCourseRating,
 }

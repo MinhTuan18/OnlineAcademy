@@ -10,3 +10,8 @@ module.exports.tokenService = require('./token.service');
 module.exports.feedbackService = require('./feedback.service');
 module.exports.chapterService = require('./chapter.service');
 module.exports.watchListService = require('./watchlist.service');
+module.exports.registeredCourseService = require('./registered-course.service');
+
+
+
+
