@@ -8,5 +8,3 @@ module.exports.feedbackRoute = require('./feedback.route');
 module.exports.chapterRoute = require('./chapter.route')
 module.exports.watchListRoute = require('./watchlist.route');
 module.exports.registeredCourseRoute = require('./registered-course.route');
-
-
