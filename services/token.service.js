@@ -59,7 +59,7 @@ const verifyToken = async (token) => {
 
         const user = await User.findById({ _id: payload.sub });
         if (!user) {
-            throw new Error('User not found');
+            throw new ApiError('User not found', httpStatus.NO_CONTENT);
         }
         return user;
     } catch (error) {

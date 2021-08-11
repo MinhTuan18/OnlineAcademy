@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const httpStatus = require('http-status');
+const mongoose = require('mongoose');
 const otpService = require('./otp.service');
 
 const { User } = require('../models');
@@ -43,6 +44,15 @@ const createUser = async (userBody) => {
 };
 
 /**
+ * Get user by id
+ * @param {ObjectId} id
+ * @returns {Promise<User>}
+**/
+const getUserById = async (id) => {
+    return User.findById(mongoose.Types.ObjectId(id));
+};
+
+/**
  * Get user by email
  * @param {string} email
  * @returns {Promise<User>}
@@ -74,11 +84,44 @@ const changePassword = async (user, oldPassword, newPassword) => {
     const paswordHash = bcrypt.hashSync(newPassword, 10);
     return await User.findByIdAndUpdate({_id: user.id}, {password: paswordHash}, {new: true});
 }
+
+/**
+ * Add course to watch list by id
+ * @param {Object} user
+ * @param {Object} course
+ * @returns {Promise<User>}
+**/
+const updateWatchlist = async (user, course) => {
+    const { _id: courseId } = course;
+    const index = user.watchList.findIndex(e => e.toString() === courseId.toString());
+
+    if (index === -1) {
+        try {
+            return await User.findByIdAndUpdate(
+                mongoose.Types.ObjectId(user.id),
+                { $push: 
+                    { 
+                        watchList: courseId,
+                    } 
+                }
+            );
+            // return true;
+        } catch (error) {
+            throw new ApiError('Failed to add course to watchlist', httpStatus.INTERNAL_SERVER_ERROR, error);
+        }
+    } 
+    throw new ApiError('This course has already been added to watchlist', httpStatus.BAD_REQUEST);
+
+    // return false;
+}
+
 module.exports = {
     isEmailTaken,
     createUser,
+    getUserById,
     getUserByEmail,
     updateUserProfile,
     updateActivatedStatus,
-    changePassword
+    updateWatchlist,
+    changePassword,
 }
