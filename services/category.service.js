@@ -101,6 +101,28 @@ const updateCategoryById = async (catId, updateBody) => {
 // };
 
 /**
+ * Update subcategory into category by id
+ * @param {ObjectId} catId
+ * @param {Object} subCatId
+ * @returns {Promise<Category>}
+**/
+const updateSubCatIntoCategoryById = async (catId, subCatId) => {
+    const options = {
+        new: true,
+        omitUndefined: true
+    }
+    return await Category.findByIdAndUpdate(
+        mongoose.Types.ObjectId(catId),
+        { $push: 
+            { 
+                subCategories: subCatId,
+            } 
+        }, 
+        options
+    );
+};
+
+/**
  * Delete category by id
  * @param {ObjectId} catId
  * @returns {Promise<category>}
@@ -119,6 +141,6 @@ module.exports = {
     getCategories,
     queryAllCategories,
     updateCategoryById, 
-    // updateSubCatIntoCategoryById,
+    updateSubCatIntoCategoryById,
     deleteCategoryById,
 }
