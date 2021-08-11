@@ -3,7 +3,7 @@ const tokenService = require('../services/token.service');
 const auth = async (req, res, next) => {
     try {
         const accessToken = req.headers['x-access-token'];
-        console.log(accessToken);
+        // console.log(accessToken);
         if (!accessToken) {
             return res.status(404).json('Invalid authorization! Access token not found');
         }
