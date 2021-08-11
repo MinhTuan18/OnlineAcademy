@@ -18,7 +18,7 @@ const generateToken = (userId, type) => {
 
     const payload = {
         sub: userId,
-        iat: moment().unix(),
+        // iat: moment().unix(),
         // exp: expires.unix(),
         type,
     };
