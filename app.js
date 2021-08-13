@@ -6,13 +6,18 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
+const formData = require('express-form-data');
+
+
 
 const cors = require('cors');
-const { userRoute, authRoute, adminRoute, subcategoryRoute, courseRoute, categoryRoute, feedbackRoute, registeredCourseRoute } = require('./routes');
+const { userRoute, authRoute, adminRoute, subcategoryRoute, courseRoute, categoryRoute, feedbackRoute, registeredCourseRoute, watchListRoute, chapterRoute } = require('./routes');
+const cloudinary = require('./services/cloudinary/cloudinary');
 
 const app = express();
 dotenv.config();
 
+app.use(formData.parse());
 app.use(express.json());
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}));
@@ -39,17 +44,6 @@ mongoose.connection.on('connected', () => {
   app.emit('app_started');
 });
 
-app.use('/api/categories', categoryRoute);
-app.use('/api/sub-categories', subcategoryRoute);
-app.use('/webhook', require('./routes/webhook.route'));
-app.use('/api/courses', courseRoute);
-app.use('/api/users', userRoute);
-app.use('/api/auth', authRoute);
-app.use('/api/admin', adminRoute);
-app.use('/api/feedback', feedbackRoute);
-app.use('/api/chapter', chapterRoute);
-app.use('/api/watchlist', watchListRoute);
-app.use('/api/registered-course', registeredCourseRoute);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -61,6 +55,32 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/api/categories', categoryRoute);
+app.use('/api/sub-categories', subcategoryRoute);
+app.use('/webhook', require('./routes/webhook.route'));
+app.use('/api/courses', courseRoute);
+app.use('/api/users', userRoute);
+app.use('/api/auth', authRoute);
+app.use('/api/admin', adminRoute);
+app.use('/api/feedback', feedbackRoute);
+app.use('/api/chapter', chapterRoute);
+app.use('/api/watchlist', watchListRoute);
+app.use('/api/registered-course', registeredCourseRoute);
+app.post('/upload', async (req, res) => {
+  try{
+    const file = req.files.file;
+    const resp = await cloudinary.uploadImage(file.path);
+    res.status(200).json(resp)
+  } catch (e){}
+});
+
+app.get('/remove/:id', async (req, res) => {
+  try{
+    const url = 'https://res.cloudinary.com/online-academy/image/upload/v1628854164/Image/vaia6fgczakxi9mmaw4p.png';
+    const resp = await cloudinary.removeImage(url);
+    res.status(200).json(resp)
+  } catch (e){}
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

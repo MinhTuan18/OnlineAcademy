@@ -28,4 +28,9 @@ module.exports = {
         rfToken: process.env.NODEMAILER_RFTOKEN,
         secret: process.env.NODEMAILER_SECRET,
     },
+    cloudinary: {
+        cloud_name: process.env.cloudName,
+        api_key: process.env.cloudAPIKey,
+        api_secret: process.env.cloudAPISecret,
+    }
 }
