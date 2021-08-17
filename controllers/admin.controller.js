@@ -1,5 +1,5 @@
 
-const { adminService } = require('../services');
+const { adminService, authService, tokenService } = require('../services');
 const { isEmailTaken} = require('../services/user.service');
 
 
@@ -66,6 +66,20 @@ const blockUser = async (req, res) => {
   }
 };
 
+const loginAdmin = async (req, res) => {
+  const { email, password } = req.body;
+    try {
+      const user = await authService.loginWithEmailAndPassword(email, password);
+      if (user.role !== 'admin') {
+        return res.status(401).json({ message:'Access Denied. Only admin can log in' });
+      }
+      const accessToken = await tokenService.generateAuthTokens(user);
+      res.status(200).json({ message: 'Successfully Logged In', data:  { isAuthenticated: true, user, accessToken: accessToken.token, expiresIn: accessToken.expires } });
+    } catch (error) {
+      res.status(error.statusCode || 500).json(error.message);
+    }
+}
+
 
 
 module.exports = {
@@ -73,4 +87,5 @@ module.exports = {
     getUserById,
     addNewUser,
     blockUser,
+    loginAdmin,
 }
