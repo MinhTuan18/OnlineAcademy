@@ -176,7 +176,7 @@ const coursesByCategory = async function (categoryId) {
     for(let sub of subCategories) {
         filter = {};
         options = {}
-        filter.category = sub.id;
+        filter.subCategory = sub.id;
         
         const data1 = await courseService.queryCourses(filter, options);
         listCourses.push(...data1.docs)
@@ -219,7 +219,7 @@ const coursesBySubCategory = async function (subCategoryId) {
 
     let filter = {};
     let options = {}
-    if (subCategoryId !== '') filter.category = subCategoryId;
+    if (subCategoryId !== '') filter.subCategory = subCategoryId;
     
     const data = await courseService.queryCourses(filter, options);
     const listCourses = data.docs
@@ -281,7 +281,7 @@ const coursesDetail = async function (courseId) {
     // })
 
     response.push({
-        'text': `*${course.title.toUpperCase()}*\n - ${course.shortDesc}\n - ${course.detailDesc}\n - GV\n - Điểm đánh giá: ${course.rating}/5 (${course.numOfRatings} lượt)\n - Đã đăng kí: ${course.numOfRegistrations} lượt\n - Học phí: ${course.fee}VND ${course.discount != '' ? '(Đang giảm ' + course.discount + '%)' : ''}`
+        'text': `*${course.title.toUpperCase()}*\n - ${course.shortDesc}\n - ${course.detailDesc}\n - ${course.instructor.name}\n - Điểm đánh giá: ${course.averageRating}/5 (${course.feedbacks.length} lượt)\n - Đã đăng kí: ${course.registeredStudents} lượt\n - Học phí: ${course.fee}VND ${course.discount != '' ? '(Đang giảm ' + course.discount + '%)' : ''}`
     })
 
     return response
