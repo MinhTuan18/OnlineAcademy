@@ -281,7 +281,7 @@ const coursesDetail = async function (courseId) {
     // })
 
     response.push({
-        'text': `*${course.title.toUpperCase()}*\n - ${course.shortDesc}\n - ${course.detailDesc}\n - ${course.instructor.name}\n - Điểm đánh giá: ${course.averageRating}/5 (${course.feedbacks.length} lượt)\n - Đã đăng kí: ${course.registeredStudents} lượt\n - Học phí: ${course.fee}VND ${course.discount != '' ? '(Đang giảm ' + course.discount + '%)' : ''}`
+        'text': `*${course.title.toUpperCase()}*\n - ${course.shortDesc}\n - ${course.detailDesc}\n - ${course.instructor.name}\n - Điểm đánh giá: ${course.averageRating}/5 (${course.feedbacks.length} lượt)\n - Đã đăng kí: ${course.registeredStudents.length} lượt\n - Học phí: ${course.fee}VND ${course.discount != '' ? '(Đang giảm ' + course.discount + '%)' : ''}`
     })
 
     return response
