@@ -115,6 +115,80 @@ const updateWatchlist = async (user, course) => {
     // return false;
 }
 
+/**
+ * Add course to instructor's created courses by id
+ * @param {ObjectId} userId
+ * @param {ObjectId} courseId
+ * @returns {Promise<User>}
+**/
+const updateCreatedCourses = async (userId, courseId) => {
+    // const { _id: courseId } = course;
+    try {
+        return await User.findByIdAndUpdate(
+            mongoose.Types.ObjectId(userId),
+            { $push: 
+                { 
+                    createdCourses: courseId,
+                } 
+            }
+        );
+    } catch (error) {
+        throw new ApiError('Failed to add course to created course list', httpStatus.INTERNAL_SERVER_ERROR, error);
+    }
+}
+
+/**
+ * Get instructor's created courses by instructor id
+ * @param {ObjectId} userId
+ * @returns {Promise<User>}
+**/
+const getCreatedCoursesByUserId = async (userId) => {
+    const createdCourses = await User.aggregate([
+        {
+            $match: {
+                isBlocked: false,
+                isActivated: true,
+                role: 'instructor',
+                _id: mongoose.Types.ObjectId(userId)
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+                createdCourses: 1,
+            },
+        },
+        {
+            $lookup: {
+                from: 'courses',
+                localField: 'createdCourses',
+                foreignField: '_id',
+                as: 'createdCourse',
+            },
+        },
+        {
+            $unwind: '$createdCourse'
+        },
+        {
+            $project: {
+                createdCourses: 0,
+            },
+        },
+    ]);
+    // const queryTotalResults = {
+    //     isBlocked: false,
+    //     isActivated: true,
+    //     role: 'instructor',
+    //     _id: mongoose.Types.ObjectId(userId)
+    // };
+    // const totalResults = await User.find(queryTotalResults).countDocuments();
+    // const { courses, totalResults } = result;
+    // const totalPages = Math.ceil(totalResults / limit);
+  
+    // return { courses, totalResults, totalPages, limit };
+    return createdCourses;
+}
+
 module.exports = {
     isEmailTaken,
     createUser,
@@ -123,5 +197,7 @@ module.exports = {
     updateUserProfile,
     updateActivatedStatus,
     updateWatchlist,
+    updateCreatedCourses,
     changePassword,
+    getCreatedCoursesByUserId,
 }
