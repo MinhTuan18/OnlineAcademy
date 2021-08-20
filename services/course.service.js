@@ -535,7 +535,7 @@ const queryOutstandingCourses = async () => {
         { $limit: 10 },
         {
             $lookup: {
-                from: 'user',
+                from: 'users',
                 localField: 'instructor',
                 foreignField: '_id',
                 as: 'instructor',

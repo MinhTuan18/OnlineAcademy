@@ -3,16 +3,16 @@ const ApiError = require('../utils/ApiError');
 const { userService, otpService, nodemailerService, courseService } = require('../services');
 
 const createUser = async (req, res) => {
-    try {
-        const { user, hash } = await userService.createUser(req.body);
-        res.status(201).json({
-            message: 'Successfully Created New User', 
-            data: user,
-            otpHash: hash
-        });
-    } catch (error) {
-        res.status(400).json(error.message);
-    }
+  try {
+      const { user, hash } = await userService.createUser(req.body);
+      res.status(201).json({
+          message: 'Successfully Created New User', 
+          data: user,
+          otpHash: hash
+      });
+  } catch (error) {
+      res.status(400).json(error.message);
+  }
     
 };
 
@@ -57,7 +57,7 @@ const resendOTP = async (req, res) => {
     const { otp, hash } = otpService.generateOTP(user.email);
     const result = await nodemailerService.sendOTP(user.email, otp);
     return res.status(200).json({ 
-                message: 'Resend OTP success', 
+                message: 'Resend OTP successfully', 
                 otp,
                 hash
             });
@@ -91,10 +91,25 @@ const updateWatchlist = async (req, res) => {
   }
 }
 
+const getCreatedCourses = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const user = await userService.getUserById(userId);
+    if (!user) {
+      throw new ApiError('User not found', httpStatus.NO_CONTENT);
+    }
+    const createdCourses = await userService.getCreatedCoursesByUserId(userId);
+    res.status(200).json({message: 'Get instructor created course list successfully', createdCourses})
+  } catch (error) {
+    res.status(error.statusCode).json({message: error.message});
+  }
+}
+
 module.exports = {
     createUser,
     updateProfile,
     activatedAccount,
     resendOTP,
     updateWatchlist,
+    getCreatedCourses,
 }

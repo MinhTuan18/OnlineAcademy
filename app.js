@@ -8,6 +8,7 @@ const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 
 const cors = require('cors');
+
 const { userRoute, authRoute, adminRoute, subcategoryRoute, courseRoute, 
   categoryRoute, feedbackRoute, registeredCourseRoute,
   chapterRoute, watchListRoute } = require('./routes');
@@ -50,7 +51,7 @@ app.use('/api/auth', authRoute);
 app.use('/api/admin', adminRoute);
 app.use('/api/feedback', feedbackRoute);
 app.use('/api/chapter', chapterRoute);
-app.use('/api/watchlist', watchListRoute);
+// app.use('/api/watchlist', watchListRoute);
 app.use('/api/registered-course', registeredCourseRoute);
 
 // view engine setup
