@@ -1,24 +1,25 @@
-const { courseService, categoryService} = require('../services');
+const { courseService, userService } = require('../services');
 const extract = require('../utils/ExtractProperties');
 
-const createCourse = async (req, res) => {
-    // const { user } = req;
-    // const { _id: instructorId } = user;
-    const courseBody = req.body;
-    try {
-        const newCourse = await courseService.createCourse(courseBody);
-        if (!newCourse) {
-            return res.status(204).json({message: 'Cannot create course', error: ''});
-        }
-        return res.status(201).json({
-            message: 'Successfully created a new course',
-            data: newCourse
-        });
-    } catch (error) {
-        return res.status(400).json(error.message);
-    }
+// const createCourse = async (req, res) => {
+//     // const { user } = req;
+//     // const { _id: instructorId } = user;
+//     const courseBody = req.body;
+//     try {
+//         const newCourse = await courseService.createCourse(courseBody);
+//         if (!newCourse) {
+//             return res.status(204).json({message: 'Cannot create course', error: ''});
+//         }
+//         return res.status(201).json({
+//             message: 'Successfully created a new course',
+//             data: newCourse
+//         });
+//     } catch (error) {
+//         return res.status(400).json(error.message);
+//     }
    
-}
+// }
+
 
 const getCourse = async (req, res) => {
     const courseId = req.params.id;
@@ -67,6 +68,30 @@ const getCourses = async (req, res) => {
         return res.status(204);
     }
     return res.status(200).json(courses);
+}
+
+const createCourse = async (req, res) => {
+    // const { user } = req;
+    // const { _id: instructorId } = user;
+    const courseBody = req.body;
+    const instructor = await userService.getUserById(req.instructorId);
+    console.log(instructor);
+    if (!instructor) {
+      throw new ApiError('Instructor not found', httpStatus.NO_CONTENT);
+    }
+    courseBody.instructor = instructor.id;
+    try {
+        const newCourse = await courseService.createCourse(courseBody);
+        if (!newCourse) {
+            return res.status(204).json({message: 'Cannot create course', error: ''});
+        }
+        console.log(newCourse);
+        userService.updateCreatedCourses(instructor.id, newCourse.id);
+        return res.status(201).json({message: 'Successfully created a new course', courseId: newCourse.id});
+    } catch (error) {
+        return res.status(400).json(error.message);
+    }
+   
 }
 
 const updateCourse = async (req, res) => {
