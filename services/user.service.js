@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const httpStatus = require('http-status');
 const otpService = require('./otp.service');
+const mongoose = require('mongoose');
+
 
 const { User } = require('../models');
 const ApiError = require('../utils/ApiError');
@@ -10,10 +12,10 @@ const ApiError = require('../utils/ApiError');
  * @returns {Promise<boolean>}
 **/
 const isEmailTaken = async (email) => {
-  const user = await User.findOne({ email });
-  //console.log(user);
-  if (!user) return false;
-  return true;
+    const user = await User.findOne({ email });
+    //console.log(user);
+    if (!user) return false;
+    return true;
 };
 
 /**
@@ -41,6 +43,9 @@ const createUser = async (userBody) => {
         throw new ApiError(error.message, httpStatus.INTERNAL_SERVER_ERROR);
     }
 };
+const getUserById = async (id) => {
+    return User.findById(mongoose.Types.ObjectId(id));
+};
 
 /**
  * Get user by email
@@ -52,8 +57,8 @@ const getUserByEmail = async (email) => {
 };
 
 const updateUserProfile = async (id, userInfo) => {
-	const result = await User.findByIdAndUpdate({_id: id}, userInfo, {new: true});
-	return result.toObject();
+    const result = await User.findByIdAndUpdate({ _id: id }, userInfo, { new: true });
+    return result.toObject();
 };
 
 const updateActivatedStatus = async (email) => {
@@ -64,7 +69,7 @@ const updateActivatedStatus = async (email) => {
     if (user.isActivated) {
         throw new ApiError('This account have been activated', httpStatus.BAD_REQUEST);
     }
-    return await User.findByIdAndUpdate({_id: user.id}, { isActivated: true }, { new: true });
+    return await User.findByIdAndUpdate({ _id: user.id }, { isActivated: true }, { new: true });
 };
 
 const changePassword = async (user, oldPassword, newPassword) => {
@@ -72,13 +77,95 @@ const changePassword = async (user, oldPassword, newPassword) => {
         throw new ApiError('Incorrect Password', httpStatus.BAD_REQUEST);
     }
     const paswordHash = bcrypt.hashSync(newPassword, 10);
-    return await User.findByIdAndUpdate({_id: user.id}, {password: paswordHash}, {new: true});
+    return await User.findByIdAndUpdate({ _id: user.id }, { password: paswordHash }, { new: true });
 }
+const updateWatchlist = async (user, course) => {
+    const { _id: courseId } = course;
+    const index = user.watchlist.findIndex(e => e.toString() === courseId.toString());
+
+    if (index === -1) {
+        try {
+            return await User.findByIdAndUpdate(
+                mongoose.Types.ObjectId(user.id),
+                {
+                    $push:
+                    {
+                        watchlist: courseId,
+                    }
+                }
+            );
+            // return true;
+        } catch (error) {
+            throw new ApiError('Failed to add course to watchlist', httpStatus.INTERNAL_SERVER_ERROR, error);
+        }
+    } else {
+        try {
+            return await User.findByIdAndUpdate(
+                mongoose.Types.ObjectId(user.id),
+                {
+                    $pull:
+                    {
+                        watchlist: courseId,
+                    }
+                }
+            );
+            // return true;
+        } catch (error) {
+            throw new ApiError('Failed to add course to watchlist', httpStatus.INTERNAL_SERVER_ERROR, error);
+        }
+    }
+    throw new ApiError('This course has already been added to watchlist', httpStatus.BAD_REQUEST);
+
+    // return false;
+}
+
+const { Course } = require('../models');
+
+const buyCourse = async (user, course) => {
+    const { _id: courseId } = course;
+    const index = user.registeredCourses.findIndex(e => e.toString() === courseId.toString());
+    const userIndex = course.registeredStudents.findIndex(e => e.toString() === user.id.toString());
+
+    if (index === -1 || userIndex === -1) {
+        try {
+            return (
+                await User.findByIdAndUpdate(
+                    mongoose.Types.ObjectId(user.id),
+                    {
+                        $push:
+                        {
+                            registeredCourses: courseId,
+                        }
+                    }
+                ) && await Course.findByIdAndUpdate(
+                    mongoose.Types.ObjectId(courseId),
+                    {
+                        $push:
+                        {
+                            registeredStudents: user.id,
+                        }
+                    }
+                )
+            )
+            // return true;
+        } catch (error) {
+            throw new ApiError('Failed to add course to registered', httpStatus.INTERNAL_SERVER_ERROR, error);
+        }
+    }
+    throw new ApiError('This course has already been added to registered', httpStatus.BAD_REQUEST);
+
+    // return false;
+}
+
+
 module.exports = {
     isEmailTaken,
     createUser,
     getUserByEmail,
     updateUserProfile,
     updateActivatedStatus,
-    changePassword
+    changePassword,
+    updateWatchlist,
+    getUserById,
+    buyCourse
 }

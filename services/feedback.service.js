@@ -43,8 +43,8 @@ const deleteFeedBack = async (feedbackId) => {
   return await Feedback.findByIdAndDelete(feedbackId);
 }
 
-const getAverageRatingOfCourse = courseId => {
-  const feedbacks = Feedback.find({ courseId: courseId});
+const getAverageRatingOfCourse = async courseId => {
+  const feedbacks = await Feedback.find({ courseId: courseId});
   if (!feedbacks) {
     throw new ApiError('Course is not exist', httpStatus.BAD_REQUEST);
   }
@@ -58,7 +58,7 @@ const getAverageRatingOfCourse = courseId => {
 }
 
 const updateCourseRating = async (courseId) => {
-  const averageRating = getAverageRatingOfCourse(courseId);
+  const averageRating = await getAverageRatingOfCourse(courseId);
   const course = await Course.findByIdAndUpdate({ _id: courseId }, { averageRating: averageRating }, { new: true });
   if (!course) {
     throw new ApiError('Course is not exist', httpStatus.BAD_REQUEST);

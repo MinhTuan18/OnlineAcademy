@@ -5,7 +5,7 @@ const createFeedback = async (req, res) => {
   const { userId, courseId, rating, ratingContent } = req.body;
   try {
     const newFeedback = await feedbackService.createFeedBack(userId, courseId, rating, ratingContent);
-    feedbackService.updateCourseRating(updatedFeedback.courseId);
+    feedbackService.updateCourseRating(newFeedback.courseId);
     return res.status(httpStatus.CREATED).json(newFeedback);
   } catch (error) {
     return res.status(error.statusCode || 500).json(error.message);
