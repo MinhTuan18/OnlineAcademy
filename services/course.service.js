@@ -615,7 +615,7 @@ const getCourseById = async (courseId) => {
     ]).lean();
     
     if (course) {
-        const feedbacks = await Feedback.find({courseId: course._id});
+        const feedbacks = await Feedback.find({courseId: course._id}).populate({path: 'userId', select: 'name'});
         course.feedbacks = feedbacks || [];
     }
     return course;
