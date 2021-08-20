@@ -1,6 +1,6 @@
 const express = require('express');
 const { watchListcontroller } = require('../controllers');
-const auth = require('../middlewares/auth.mdw');
+const {auth} = require('../middlewares/auth.mdw');
 const router = express.Router();
 
 router.post('/:id', auth, watchListcontroller.addNewCourseToWatchList);
