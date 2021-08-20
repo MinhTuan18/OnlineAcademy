@@ -15,4 +15,5 @@ router
   .patch(auth, courseController.updateCourse)
   .delete(auth, courseController.deleteCourse);
 
+router.get('/getCourses/query', courseController.getCourseList);
 module.exports = router;

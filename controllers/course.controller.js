@@ -55,6 +55,9 @@ const getCourses = async (req, res) => {
             courses = await courseService.queryBestSellerCourses();
             console.log(courses);
             break; 
+        case '4':
+            courses = await courseService.queryOutstandingCourses();
+            break;
         default:
             // console.log('OK');
             filter = extract(req.query, ['title', 'category', 'subCategory']);
@@ -116,10 +119,21 @@ const deleteCourse = async (req, res) => {
     })
 }
 
+const getCourseList = async (req, res) => {
+    filter = extract(req.query, ['title', 'category', 'subCategory']);
+    options = extract(req.query, ['sortBy', 'limit', 'page']);
+    courses = await courseService.getCourseList(filter, options);
+    if (!courses || courses.length === 0) {
+        return res.status(204);
+    }
+    return res.status(200).json(courses);
+}
+
 module.exports = {
     getCourse,
     getCourses,
     createCourse,
     updateCourse,
     deleteCourse,
+    getCourseList
 }
