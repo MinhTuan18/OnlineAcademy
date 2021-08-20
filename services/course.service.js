@@ -148,7 +148,6 @@ const queryCoursesFilterByCategory = async (filter, options) => {
     const querySubcatsCoursesInCategoryResults = await Category.aggregate(querySubcatCoursesInCategory);
     // console.log(querySubcatsCoursesInCategoryResults);
     const { subCatCourseIds } = querySubcatsCoursesInCategoryResults[0];
-    console.log(subCatCourseIds);
     let courseIds = [];
     subCatCourseIds.forEach(subCatCourseId => {
       courseIds = [...courseIds, ...subCatCourseId];
@@ -208,7 +207,6 @@ const queryCoursesFilterByCategory = async (filter, options) => {
     }
   
     const courses = await Course.aggregate(queryFilter);  
-    console.log(courses);
     const totalResults = await Course.find(queryTotalResults).countDocuments();
     return { courses, totalResults };
 };
@@ -297,12 +295,11 @@ const queryCoursesFilterByCategory = async (filter, options) => {
  * @returns {Promise<QueryResult>}
 **/
  const queryCoursesAdvancedFilter = async (filter, options) => {
-    // console.log(filter);
     const categoryId = filter.category === undefined ? undefined : new mongoose.Types.ObjectId(filter.category);
     const subCategoryId = filter.subCategory === undefined ? undefined : new mongoose.Types.ObjectId(filter.subCategory);
     const title = filter.title === undefined ? undefined : filter.title;
 
-    const limit = options.limit ? options.limit : 10;
+    const limit = options.limit ? parseInt(options.limit) : 10;
     const page = options.page ? options.page : 1;
     const skip = (page - 1) * limit;
   
@@ -334,7 +331,6 @@ const queryCoursesFilterByCategory = async (filter, options) => {
     else {
         // console.log('OK');
         result = await queryCourses({}, { limit, skip, sort });
-        console.log(result);
         const { docs: courses, totalDocs: totalResults, totalPages } = result;    
         return { courses, totalResults, totalPages, limit };
     }
@@ -607,7 +603,15 @@ const queryBestSellerCourses = async () => {
  * @returns {Promise<Course>}
 **/
 const getCourseById = async (courseId) => {
-    return Course.findById(mongoose.Types.ObjectId(courseId));
+    return Course.findById(mongoose.Types.ObjectId(courseId)).populate([{
+            path:'instructor',
+            select:'-password'
+        },
+        {
+            path: 'subCategory',
+            select: 'name'
+        }
+    ]);
 };
 
 /**
