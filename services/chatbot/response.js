@@ -53,8 +53,8 @@ const search = async function (searchString) {
     const listCourses = data.docs
 
     // console.log(listCourses)
-    if(!listCourses) {
-        return ({"text": `Không tìm thấy khóa học nào!`})
+    if(listCourses === [] || listCourses.length === 0) {
+        return {"text": `Không tìm thấy khóa học nào!`}
     }
 
     for (let c of listCourses) {
@@ -99,6 +99,8 @@ const categories = async function () {
     const listCategories = data.docs
     // const listCategories = await require('./categories.json');
     // console.log(listCategories)
+    
+
     for (let c of listCategories) {
         response.attachment.payload.elements.push({
             "title": c.name,
@@ -139,6 +141,10 @@ const subCategories = async function (categoryId) {
     const subCategories = data.docs
     // const listCategories = await require('./categories.json');
     // console.log(subCategories)
+    if(subCategories === [] || subCategories.length === 0) {
+        return {"text": `Không tìm thấy danh mục nào!`}
+    }
+
     for (let c of subCategories) {
         response.attachment.payload.elements.push({
             "title": c.name,
@@ -187,8 +193,8 @@ const coursesByCategory = async function (categoryId) {
     
     // console.log(listCourses)
 
-    if(!listCourses) {
-        return ({"text": `Không tìm thấy khóa học nào!`})
+    if(listCourses === [] || listCourses.length === 0) {
+        return {"text": `Không tìm thấy khóa học nào!`}
     }
 
     for (let c of listCourses) {
@@ -231,8 +237,8 @@ const coursesBySubCategory = async function (subCategoryId) {
     const listCourses = data.docs
     // console.log(listCourses)
 
-    if(!listCourses) {
-        return ({"text": `Không tìm thấy khóa học nào!`})
+    if(listCourses === [] || listCourses.length === 0) {
+        return {"text": `Không tìm thấy khóa học nào!`}
     }
 
     for (let c of listCourses) {
