@@ -1,6 +1,7 @@
 const { searchconsole } = require('googleapis/build/src/apis/searchconsole');
 const mongoose = require('mongoose');
 const { Course, SubCategory, Category, RegisteredCourse } = require('../models');
+const Feedback = require('../models/feedback.model');
 
 /**
  * Create a course
