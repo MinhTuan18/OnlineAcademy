@@ -53,6 +53,9 @@ const search = async function (searchString) {
     const listCourses = data.docs
 
     // console.log(listCourses)
+    if(!listCourses) {
+        return ({"text": `Không tìm thấy khóa học nào!`})
+    }
 
     for (let c of listCourses) {
         response.attachment.payload.elements.push({
@@ -184,6 +187,9 @@ const coursesByCategory = async function (categoryId) {
     
     // console.log(listCourses)
 
+    if(!listCourses) {
+        return ({"text": `Không tìm thấy khóa học nào!`})
+    }
 
     for (let c of listCourses) {
         response.attachment.payload.elements.push({
@@ -224,6 +230,10 @@ const coursesBySubCategory = async function (subCategoryId) {
     const data = await courseService.queryCourses(filter, options);
     const listCourses = data.docs
     // console.log(listCourses)
+
+    if(!listCourses) {
+        return ({"text": `Không tìm thấy khóa học nào!`})
+    }
 
     for (let c of listCourses) {
         response.attachment.payload.elements.push({
