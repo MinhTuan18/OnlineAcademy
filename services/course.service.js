@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { Course, SubCategory, Category, RegisteredCourse } = require('../models');
+const Feedback = require('../models/feedback.model');
 
 /**
  * Create a course
@@ -603,7 +604,7 @@ const queryBestSellerCourses = async () => {
  * @returns {Promise<Course>}
 **/
 const getCourseById = async (courseId) => {
-    return Course.findById(mongoose.Types.ObjectId(courseId)).populate([{
+    const course = await Course.findById(mongoose.Types.ObjectId(courseId)).populate([{
             path:'instructor',
             select:'-password'
         },
@@ -611,7 +612,13 @@ const getCourseById = async (courseId) => {
             path: 'subCategory',
             select: 'name'
         }
-    ]);
+    ]).lean();
+    
+    if (course) {
+        const feedbacks = await Feedback.find({courseId: course._id});
+        course.feedbacks = feedbacks || [];
+    }
+    return course;
 };
 
 /**
