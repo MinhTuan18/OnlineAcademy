@@ -76,7 +76,7 @@ const activateAccount =  async (req, res) => {
 const resendOTP = async (req, res) => {
   const { email } = req.body;
   const { otp, hash } = otpService.generateOTP(email);
-  // console.log(otp);
+  console.log(otp);
   // console.log(hash);
   const sendOTPResult = await nodemailerService.sendOTP(email, otp);
   res.status(200).json({ success: true, message: 'Successfully resent OTP to user email', hash});

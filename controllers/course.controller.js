@@ -1,5 +1,25 @@
-const { courseService, categoryService} = require('../services');
+const { courseService, userService } = require('../services');
 const extract = require('../utils/ExtractProperties');
+
+// const createCourse = async (req, res) => {
+//     // const { user } = req;
+//     // const { _id: instructorId } = user;
+//     const courseBody = req.body;
+//     try {
+//         const newCourse = await courseService.createCourse(courseBody);
+//         if (!newCourse) {
+//             return res.status(204).json({message: 'Cannot create course', error: ''});
+//         }
+//         return res.status(201).json({
+//             message: 'Successfully created a new course',
+//             data: newCourse
+//         });
+//     } catch (error) {
+//         return res.status(400).json(error.message);
+//     }
+   
+// }
+
 
 const getCourse = async (req, res) => {
     const courseId = req.params.id;
@@ -11,20 +31,7 @@ const getCourse = async (req, res) => {
 }
 
 const getCourses = async (req, res) => {
-    // const categoryId  = req.query.catId || '';
-    // //console.log(categoryId);
-    // const courseTitle = req.query.title || '';
-    // //console.log(courseTitle);
-    // const sortBy = req.query.sortBy || '';
-    // // const limit = req.query.limit || '';
-    // // const page = req.query.page || '';
     const { type } = req.query;
-    // console.log(type);
-    // let filter = {};
-    // let options = {
-    //     limit: req.query.limit || 10,
-    //     page: req.query.page || 1
-    // }
     let filter, options, courses;
     switch (type) {
         case '1':
@@ -57,13 +64,6 @@ const getCourses = async (req, res) => {
             break;
             
     }
-    // if (categoryId !== '') filter.category = categoryId;
-    // if (courseTitle !== '') filter.$text = { $search: courseTitle };
-    // //console.log(filter);
-    // if (sortBy !== '') options.sort = {sortBy: 1};
-    
-    // const courses = await courseService.queryCourses(filter, options);
-    // //console.log(courses);
     if (!courses || courses.length === 0) {
         return res.status(204);
     }
@@ -74,12 +74,20 @@ const createCourse = async (req, res) => {
     // const { user } = req;
     // const { _id: instructorId } = user;
     const courseBody = req.body;
+    const instructor = await userService.getUserById(req.instructorId);
+    console.log(instructor);
+    if (!instructor) {
+      throw new ApiError('Instructor not found', httpStatus.NO_CONTENT);
+    }
+    courseBody.instructor = instructor.id;
     try {
         const newCourse = await courseService.createCourse(courseBody);
         if (!newCourse) {
             return res.status(204).json({message: 'Cannot create course', error: ''});
         }
-        return res.status(201).json('Successfully created a new course');
+        console.log(newCourse);
+        userService.updateCreatedCourses(instructor.id, newCourse.id);
+        return res.status(201).json({message: 'Successfully created a new course', courseId: newCourse.id});
     } catch (error) {
         return res.status(400).json(error.message);
     }

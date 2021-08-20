@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const httpStatus = require('http-status');
+const mongoose = require('mongoose');
 const otpService = require('./otp.service');
 
 const { User } = require('../models');
@@ -43,6 +44,15 @@ const createUser = async (userBody) => {
 };
 
 /**
+ * Get user by id
+ * @param {ObjectId} id
+ * @returns {Promise<User>}
+**/
+const getUserById = async (id) => {
+    return User.findById(mongoose.Types.ObjectId(id));
+};
+
+/**
  * Get user by email
  * @param {string} email
  * @returns {Promise<User>}
@@ -74,11 +84,120 @@ const changePassword = async (user, oldPassword, newPassword) => {
     const paswordHash = bcrypt.hashSync(newPassword, 10);
     return await User.findByIdAndUpdate({_id: user.id}, {password: paswordHash}, {new: true});
 }
+
+/**
+ * Add course to watch list by id
+ * @param {Object} user
+ * @param {Object} course
+ * @returns {Promise<User>}
+**/
+const updateWatchlist = async (user, course) => {
+    const { _id: courseId } = course;
+    const index = user.watchList.findIndex(e => e.toString() === courseId.toString());
+
+    if (index === -1) {
+        try {
+            return await User.findByIdAndUpdate(
+                mongoose.Types.ObjectId(user.id),
+                { $push: 
+                    { 
+                        watchList: courseId,
+                    } 
+                }
+            );
+            // return true;
+        } catch (error) {
+            throw new ApiError('Failed to add course to watchlist', httpStatus.INTERNAL_SERVER_ERROR, error);
+        }
+    } 
+    throw new ApiError('This course has already been added to watchlist', httpStatus.BAD_REQUEST);
+
+    // return false;
+}
+
+/**
+ * Add course to instructor's created courses by id
+ * @param {ObjectId} userId
+ * @param {ObjectId} courseId
+ * @returns {Promise<User>}
+**/
+const updateCreatedCourses = async (userId, courseId) => {
+    // const { _id: courseId } = course;
+    try {
+        return await User.findByIdAndUpdate(
+            mongoose.Types.ObjectId(userId),
+            { $push: 
+                { 
+                    createdCourses: courseId,
+                } 
+            }
+        );
+    } catch (error) {
+        throw new ApiError('Failed to add course to created course list', httpStatus.INTERNAL_SERVER_ERROR, error);
+    }
+}
+
+/**
+ * Get instructor's created courses by instructor id
+ * @param {ObjectId} userId
+ * @returns {Promise<User>}
+**/
+const getCreatedCoursesByUserId = async (userId) => {
+    const createdCourses = await User.aggregate([
+        {
+            $match: {
+                isBlocked: false,
+                isActivated: true,
+                role: 'instructor',
+                _id: mongoose.Types.ObjectId(userId)
+            },
+        },
+        {
+            $project: {
+                _id: 0,
+                createdCourses: 1,
+            },
+        },
+        {
+            $lookup: {
+                from: 'courses',
+                localField: 'createdCourses',
+                foreignField: '_id',
+                as: 'createdCourse',
+            },
+        },
+        {
+            $unwind: '$createdCourse'
+        },
+        {
+            $project: {
+                createdCourses: 0,
+            },
+        },
+    ]);
+    // const queryTotalResults = {
+    //     isBlocked: false,
+    //     isActivated: true,
+    //     role: 'instructor',
+    //     _id: mongoose.Types.ObjectId(userId)
+    // };
+    // const totalResults = await User.find(queryTotalResults).countDocuments();
+    // const { courses, totalResults } = result;
+    // const totalPages = Math.ceil(totalResults / limit);
+  
+    // return { courses, totalResults, totalPages, limit };
+    return createdCourses;
+}
+
 module.exports = {
     isEmailTaken,
     createUser,
+    getUserById,
     getUserByEmail,
     updateUserProfile,
     updateActivatedStatus,
-    changePassword
+    updateWatchlist,
+    updateCreatedCourses,
+    changePassword,
+    getCreatedCoursesByUserId,
 }

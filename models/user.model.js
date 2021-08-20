@@ -52,7 +52,11 @@ const UserSchema = new mongoose.Schema(
             type: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Course' }],
             default: [],
         },
-        watchlist: {
+        watchList: {
+            type: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Course' }],
+            default: [],
+        },
+        createdCourses: {
             type: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Course' }],
             default: [],
         },
