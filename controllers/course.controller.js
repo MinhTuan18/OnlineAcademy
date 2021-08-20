@@ -20,6 +20,7 @@ const extract = require('../utils/ExtractProperties');
    
 // }
 
+
 const getCourse = async (req, res) => {
     const courseId = req.params.id;
     const course = await courseService.getCourseById(courseId);
