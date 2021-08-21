@@ -561,66 +561,95 @@ const queryOutstandingCourses = async () => {
 };
 
 const queryOutstandingCoursesByRegistered = async () => {
-    const start = moment().subtract(7, 'days').toDate().toISOString();
-  
-    // status: 2 - published
-    const courses = await Course.aggregate([
+    const startingPoint = moment().subtract(7, 'days').toDate().toISOString();
+    const registeredCourses = await RegisteredCourse.aggregate([
+        {
+            $project: {
+                course: 1,
+                student: 1,
+                createdAt: 1,
+                registeredInLast7Days: {
+                    $gte: ['$createdAt', startingPoint]
+                }
+            },
+        },
         {
             $match: {
-                createdAt: {
-                    $gte: start,
-                },
-                isBlocked: false,
+                registeredInLast7Days: true,
             },
         },
         {
             $project: {
-                title: 1,
-                subCategory: 1,
-                thumbnailImageUrl: 1,
-                instructor: 1,
-                averageRating: 1,
-                totalRatings: 1,
-                fee: 1,
-                discount: 1,
-                createdAt: 1,
-                totalComments: {
-                    $size: '$comments',
-                },
-                totalViews: 1,
-            },
+                registeredInLast7Days: 0,
+            }
         },
-        { $sort: 
-            { totalViewer: -1 } 
-        },
-        { $limit: 10 },
         {
             $lookup: {
-                from: 'users',
-                localField: 'instructor',
+                from: 'courses',
+                localField: 'course',
                 foreignField: '_id',
-                as: 'instructor',
+                as: 'course',
+            },            
+        },
+        {
+            $lookup: {
+                from: 'subcategories',
+                localField: 'course.subCategory',
+                foreignField: '_id',
+                as: 'course.subCategory',
+            },
+        },
+        
+        {
+            $addFields: {
+                subCategoryId: '$course.subCategory._id',
+            },
+        },
+
+        {
+            $unwind: '$course.subCategory'
+        },
+        {
+            $unwind: '$subCategoryId'
+        },
+        {
+            $project: {
+                'course.subCategory': 0,
+            }
+        },
+        {
+            $group: 
+            { 
+                _id: { subCategoryId : '$subCategoryId' },
+                // subCategoryId: { "$first": "$subCategoryId" },
+                count: { $sum: 1 }
+            } 
+        },
+        { $sort: { count: -1 } },
+        { $limit: 4 },
+        {
+            $lookup: {
+                from: 'subcategories',
+                localField: '_id.subCategoryId',
+                foreignField: '_id',
+                as: '_id.subCategory',
             },
         },
         {
             $addFields: {
-                instructorName: '$instructor.name',
+                subCategory: '$_id.subCategory',
             },
+        },
+        {
+            $unwind: '$subCategory'
         },
         {
             $project: {
-                instructor: 0,
-            },
+                '_id': 0,
+            }
         },
-        {
-            $unwind: '$instructorName',
-        },
-        { $sort: 
-            { registeredStudents: -1 } 
-        },
-        { $limit: 4 },
     ]);
-    return courses;
+    return registeredCourses;
 };
 
 /**
@@ -776,7 +805,7 @@ const getCourseByCategoryId = async (filter, options) => {
     const subCats = await SubCategory.find({ category: id});
     if (!subCats) return {courses: [], totalResults: 0};
 
-    const query = Course.find({subCategory: {$in : subCats}})
+    const query = Course.find({subCategory: {$in : subCats}}).find({isBlocked: false})
                         .select('thumbnailImageUrl fee title subCategory instructor averageRating ')
                         .populate([
                             {
@@ -823,7 +852,7 @@ const getCourseBySubCategoryId = async (filter, options) => {
     const { id, title } = filter;
     const { sort, limit, skip } = options;
 
-    const query = Course.find({subCategory: id})
+    const query = Course.find({subCategory: id}).find({isBlocked: false})
                         .select('thumbnailImageUrl fee title subCategory instructor averageRating')
                         .populate([
                             {
@@ -870,7 +899,7 @@ const getAllCourses = async (filter, options) => {
     const { title } = filter;
     const { sort, limit, skip } = options;
 
-    const query = Course.find()
+    const query = Course.find().find({isBlocked: false})
                         .select('thumbnailImageUrl fee title subCategory instructor averageRating ')
                         .populate([
                             {
