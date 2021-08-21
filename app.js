@@ -8,7 +8,10 @@ const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 
 const cors = require('cors');
-const { userRoute, authRoute, adminRoute, subcategoryRoute, courseRoute, categoryRoute, feedbackRoute, registeredCourseRoute, chapterRoute } = require('./routes');
+
+const { userRoute, authRoute, adminRoute, subcategoryRoute, courseRoute, 
+  categoryRoute, feedbackRoute, registeredCourseRoute,
+  chapterRoute, watchListRoute } = require('./routes');
 
 const app = express();
 dotenv.config();
