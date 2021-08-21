@@ -182,6 +182,7 @@ const getCreatedCoursesByUserId = async (userId) => {
                 as: 'createdCourse.subCategory',
             },
         },
+        
         {
             $addFields: {
                 'createdCourse.subCategoryName': '$createdCourse.subCategory.name'
