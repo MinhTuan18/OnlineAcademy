@@ -174,6 +174,22 @@ const getCreatedCoursesByUserId = async (userId) => {
                 createdCourses: 0,
             },
         },
+        {
+            $lookup: {
+                from: 'subcategories',
+                localField: 'createdCourse.subCategory',
+                foreignField: '_id',
+                as: 'createdCourse.subCategory',
+            },
+        },
+        {
+            $addFields: {
+                'createdCourse.subCategoryName': '$createdCourse.subCategory.name'
+            }
+        },
+        {
+            $unwind: '$createdCourse.subCategoryName',
+        },
     ]);
     // const queryTotalResults = {
     //     isBlocked: false,
